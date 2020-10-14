@@ -8,6 +8,7 @@ public class Exercise2 {
         String p1 = s.next();
         System.out.print("\nWhat is the name of the second player? ");
         String p2 = s.next();
+        /* Ensures the players have different names */
         while(p1.equalsIgnoreCase(p2)) {
             System.out.print("\nBoth players cannot be named " + p2 + ". Enter a different name: ");
             p2 = s.next();
@@ -25,12 +26,14 @@ public class Exercise2 {
         }
         startGame(p1, p2, chips);
     }
+    /* set up the game */
     public static void startGame(String p1, String p2, int chips) {
         int pile = chips;
         int p1Chips = 0;
         int p2Chips = 0;
         boolean first = true;
         while(pile > 0) {
+            /* separates each player's turn */
             System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * \n");
             System.out.printf("%s has %d chips.\n", p1, p1Chips);
             System.out.printf("%s has %d chips.\n", p2, p2Chips);
@@ -55,10 +58,12 @@ public class Exercise2 {
         System.out.print("\n\nPlay another game? (y/n) ");
         Scanner s = new Scanner(System.in);
         String replay = s.next();
+        /* new game swaps which player goes first */
         if(replay.equalsIgnoreCase("y")) {
-            startGame(p1, p2, chips);
+            startGame(p2, p1, chips);
         }
     }
+    /* method for when a player is attempting to take chips from the pile */
     public static int getChips(String player, int pile) {
         Scanner s = new Scanner(System.in);
         int max = ((pile - (pile % 2)) / 2);
@@ -68,6 +73,7 @@ public class Exercise2 {
         } else {
             System.out.println("There are " + pile + " chips remaining.");
         }
+        /* if player can only take 1 chip, then they will take 1 chip */
         if(max == 1 || pile == 1) {
             System.out.println("\nyou must take 1 chip, " + player);
             return 1;
