@@ -9,16 +9,20 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.ss.lms.dao.AuthorDAO;
+import com.ss.lms.dao.BookCopiesDAO;
 import com.ss.lms.dao.BranchDAO;
 import com.ss.lms.dao.GenreDAO;
 import com.ss.lms.dao.LoanDAO;
 import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.dao.BookDAO;
-
+import com.ss.lms.dao.BorrowerDAO;
 import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
+import com.ss.lms.entity.BookCopies;
+import com.ss.lms.entity.Borrower;
 import com.ss.lms.entity.Branch;
 import com.ss.lms.entity.Genre;
+import com.ss.lms.entity.Loan;
 import com.ss.lms.entity.Publisher;
 
 public class AdministratorService {
@@ -551,6 +555,7 @@ public class AdministratorService {
 							}
 						} catch (InputMismatchException e) {
 							System.out.println("Error: not an integer");
+							return null;
 						}
 					}
 				}
@@ -721,6 +726,19 @@ public class AdministratorService {
 		}
 	}
 	
+	public void readAuthors() {
+   		try (Connection conn = conUtil.getConnection()){
+   			AuthorDAO adao = new AuthorDAO(conn);
+   			List<Author> Authors = adao.readAllAuthors();
+   			for(Author a: Authors) {
+   				a.adminPrint();;
+   			}
+   		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+   		}
+   	}
+	
 	/* GENRE FUNCTIONS */
 	public void addGenre() {
 		boolean unique = false;
@@ -754,7 +772,6 @@ public class AdministratorService {
    			List<Genre> Genres;
    			Genre genre = null;
    			String input = "";
-   			int genreId = 0;
 	   		int count = 1;
 	   		/* get genreId */
    			while(genre == null) {
@@ -882,6 +899,19 @@ public class AdministratorService {
 		}
 	}
 	
+	public void readGenres() {
+   		try (Connection conn = conUtil.getConnection()){
+   			GenreDAO gdao = new GenreDAO(conn);
+   			List<Genre> Genres = gdao.readAllGenres();
+   			for(Genre g: Genres) {
+   				g.adminPrint();;
+   			}
+   		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+   		}
+   	}
+	
 	/* PUBLISHER FUNCTIONS */
 	public void addPublisher() {
 		boolean unique = false;
@@ -935,7 +965,6 @@ public class AdministratorService {
    			List<Publisher> Publishers;
    			Publisher publisher = null;
    			String input = "";
-   			int publisherId = 0;
 	   		int count = 1;
 	   		/* get publisherId */
    			while(publisher == null) {
@@ -1084,6 +1113,19 @@ public class AdministratorService {
 			return;
 		}
 	}
+	
+	public void readPublishers() {
+   		try (Connection conn = conUtil.getConnection()){
+   			PublisherDAO pdao = new PublisherDAO(conn);
+   			List<Publisher> Publishers = pdao.getPublishers();
+   			for(Publisher p: Publishers) {
+   				p.adminPrint();;
+   			}
+   		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+   		}
+   	}
 	/* BRANCH FUNCTIONS */
 	public void addBranch() {
 		boolean unique = false;
@@ -1210,27 +1252,312 @@ public class AdministratorService {
 		}
 
 	}
+	
+	public void readBranches() {
+   		try (Connection conn = conUtil.getConnection()){
+   			BranchDAO brdao = new BranchDAO(conn);
+   			List<Branch> Branches = brdao.readAllBranches();
+   			for(Branch b: Branches) {
+   				b.adminPrint();;
+   			}
+   		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+   		}
+   	}
+	
 	/* BRANCH HELPER FUNCTIONS */
 	public void updateBranchDetails(Branch branch) {
 		LS.UpdateLibrary(branch);
 	}
 	public void setBookCopies(Branch branch) {
 		try (Connection conn = conUtil.getConnection()){
-			LoanDAO ldao = new LoanDAO(conn);
 			/* get book */
 			Book book = readBook(chooseBook());
+			/* get loans */
+			LoanDAO ldao = new LoanDAO(conn);
+			int bookLoans = ldao.getBranchBookLoans(branch, book);
+			System.out.println("There are " + bookLoans + " outstanding loans for this book");
+			/* get number of copies */
+			BookCopiesDAO bcdao = new BookCopiesDAO(conn);
+			List<BookCopies> bookCopies = bcdao.findBookCopiesByBranch(book, branch);
+			BookCopies BC = null;
+			if(bookCopies.size() == 0) {
+				System.out.println("There are currently no copies of the book in the current branch");
+				BC = new BookCopies(book.getBookId(), branch.getBranchId(), 0);
+				bcdao.addBookCopies(BC);
+			} else {
+				BC = bookCopies.get(0);
+				System.out.println("There are currently " + BC.getNoOfCopies() + " copies of the book in the current branch");
+			}
+			System.out.print("New number of book copies: ");
 			
+			int numCopies = -1;
+			while(numCopies < bookLoans) {
+				numCopies = scanner.nextInt();
+				if(numCopies == 0 && bookLoans == 0) {
+					// delete book
+					bcdao.deleteBookCopies(BC);
+					System.out.println("All Book copies deleted");
+				} else if(numCopies == 0 && bookLoans > 0) {
+					System.out.println("Error: You cannot have less book copies than there are books loaned out");
+					numCopies = -1;
+				} else if(numCopies < 0) {
+					System.out.println("Error: Input must be greater than or equal to 0");
+				} else {
+					// change # of books
+					BC.setnoOfCopies(numCopies);
+					bcdao.updateBookCopies(BC);
+					System.out.println("There are now " + numCopies + " copies");
+				}
+			}
 	 	} catch (ClassNotFoundException | SQLException e) {
+	 		System.out.print("SQL ERROR :(");
 			e.printStackTrace();
 			return;
 		}
 
-		//readAllBooksByName
 	}
-	/* BOOK COPY FUNCTIONS */
 	/* BORROWER FUNCTIONS */
-	/* OVERRIDE DUE DATE */
+	public void addBorrower() {
+		String borrowerName = "";
+		String borrowerAddress = "";
+		String borrowerPhone = "";
+   		try (Connection conn = conUtil.getConnection()){
+   			BorrowerDAO bodao = new BorrowerDAO(conn);
+   			/* get borrower name */
+   			while(borrowerName.isEmpty() || borrowerName.length() > 45) {
+   	   			System.out.print("New borrower name:");
+   	   			borrowerName = scanner.nextLine();
+   	   			if(borrowerName.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			}
+   	   		}
+   			/* get borrower address */
+   			while(borrowerAddress.isEmpty() || borrowerAddress.length() > 45) {
+   	   			System.out.print("New borrower address:");
+   	   			borrowerAddress = scanner.nextLine();
+   	   			if(borrowerAddress.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			}
+   	   		}
+   			/* get borrower phone */
+   			while(borrowerPhone.isEmpty() || borrowerPhone.length() > 45) {
+   	   			System.out.print("New borrower phone:");
+   	   			borrowerPhone = scanner.nextLine();
+   	   			if(borrowerPhone.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			}
+   	   		}
+   			bodao.addBorrower(borrowerName, borrowerAddress, borrowerPhone);
+   			System.out.println("Borrower added");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			System.out.println("Could not add borrower");
+ 			return;
+ 		}
+	}
 	
+	public void updateBorrower() {
+		boolean unique = false;
+   		try (Connection conn = conUtil.getConnection()){
+   			BorrowerDAO bodao = new BorrowerDAO(conn);
+   			List<Borrower> Borrowers;
+   			Borrower borrower = null;
+   			String input = "";
+	   		int count = 1;
+	   		/* get borrowerId */
+   			while(borrower == null) {
+   	   			System.out.println("Choose Borrower by keyword (leave blank to see a list of all borrowers)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Borrowers = bodao.readAllBorrowers();
+   	   			} else {
+   	   				Borrowers = bodao.readAllBorrowersByName(input);
+   	   			}
+   	   			/* create borrower list to choose from */
+   	   			if(Borrowers.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Borrowers.size() == 1) {
+   	   				borrower = Borrowers.get(0);
+   	   				System.out.println("Borrower name = " + borrower.getName() + ", "
+   	   						+ borrower.getAddress() + ": " + borrower.getPhone());
+   	   			} else {
+					System.out.println("Borrowers:");
+					count = 1;
+					for(Borrower p: Borrowers) {
+						System.out.println(count + ") " + p.getName() + ", " + p.getAddress() + ": " + p.getPhone());
+						count++;
+					}
+					System.out.print("Choose a borrower to update (from the integer list): ");
+					int borrowerOption = 0;
+					while(borrowerOption < 1 || borrowerOption >= count) {
+						try {
+							borrowerOption = scanner.nextInt();
+							scanner.nextLine();
+							if(borrowerOption < 1 || borrowerOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								borrower = Borrowers.get(borrowerOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+							break;
+						}
+					}
+   	   			}
+   			}
+   			/* update Borrower Name using borrowerId and borrowerName */
+   			while(!unique) {
+   	   			System.out.println("New Borrower Name: (leave blank if no change)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty() || input.equalsIgnoreCase(borrower.getName())) {
+   	   				System.out.println("Continuing...");
+   	   				unique = true;
+   	   			}
+   			}
+   			borrower.setName(input);
+   			/* update Borrower address */
+	   		System.out.println("New Borrower Address: (leave blank if no change)");
+	   		input = scanner.nextLine();
+	   		if(input.isEmpty() || input.equalsIgnoreCase(borrower.getAddress())) {
+	   			System.out.println("Continuing...");
+	   		} else if(input.length() <= 45) {
+	   			borrower.setAddress(input);
+	   		} else {
+	   			System.out.println("Address is too long... skipping");
+	   		}
+   			/* update Borrower phone */
+	   		System.out.println("New Borrower Phone: (leave blank if no change)");
+	   		input = scanner.nextLine();
+	   		if(input.isEmpty() || input.equalsIgnoreCase(borrower.getPhone())) {
+	   			System.out.println("Continuing...");
+	   		} else if(input.length() <= 45) {
+	   			borrower.setPhone(input);
+	   		} else {
+	   			System.out.println("Phone Number is too long... skipping");
+	   		}
+   			bodao.updateBorrower(borrower);
+   			System.out.println("Borrower updated");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			e.printStackTrace();
+ 			System.out.println("Could not add borrower");
+ 			return;
+ 		}
+	}
+	
+	public void deleteBorrower() {
+   		try (Connection conn = conUtil.getConnection()){
+   			BorrowerDAO bodao = new BorrowerDAO(conn);
+   			List<Borrower> Borrowers;
+   			Borrower borrower = null;
+   			String input = "";
+	   		int count = 1;
+	   		/* get borrowerId */
+   			while(borrower == null) {
+   	   			System.out.println("Choose Borrower by name (leave blank to see a list of all borrowers)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Borrowers = bodao.readAllBorrowers();
+   	   			} else {
+   	   				Borrowers = bodao.readAllBorrowersByName(input);
+   	   			}
+   	   			/* create borrower list to choose from */
+   	   			if(Borrowers.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Borrowers.size() == 1) {
+   	   				borrower = Borrowers.get(0);
+   	   				System.out.println("Borrower name = " + borrower.getName() + ", "
+   	   						+ borrower.getAddress() + ": " + borrower.getPhone());
+   	   			} else {
+					System.out.println("Borrowers:");
+					count = 1;
+					for(Borrower p: Borrowers) {
+						System.out.println(count + ") " + p.getName() + ", " + p.getAddress() + ": " + p.getPhone());
+						count++;
+					}
+					System.out.print("Choose a borrower to delete (from the integer list): ");
+					int borrowerOption = 0;
+					while(borrowerOption < 1 || borrowerOption >= count) {
+						try {
+							borrowerOption = scanner.nextInt();
+							scanner.nextLine();
+							if(borrowerOption < 1 || borrowerOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								borrower = Borrowers.get(borrowerOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+							break;
+						}
+					}
+   	   			}
+				LoanDAO ldao = new LoanDAO(conn);
+				int dependencies = ldao.checkBorrowerLoanDependency(borrower);
+				if(dependencies > 0) {
+					System.out.println("Cannot Delete: Borrower has " + dependencies + " books loaned out");
+				} else {
+					bodao.deleteBorrower(borrower);
+					System.out.println("borrower deleted");
+				}
+   			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+	public void readBorrowers() {
+   		try (Connection conn = conUtil.getConnection()){
+   			BorrowerDAO bodao = new BorrowerDAO(conn);
+   			List<Borrower> Borrowers = bodao.readAllBorrowers();
+   			for(Borrower b: Borrowers) {
+   				b.adminPrint();;
+   			}
+   		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+   		}
+   	}
+	/* OVERRIDE DUE DATE */
+	public void overrideDueDate() {
+		System.out.println("Printing all loans currently out");
+   		try (Connection conn = conUtil.getConnection()){
+   			LoanDAO ldao = new LoanDAO(conn);
+   			List<Loan> Loans = ldao.readAllActiveLoans();
+   			int counter = 1;
+   			if(Loans.size() == 0) {
+   				System.out.println("No active loans. Returning...");
+   				return;
+   			} else {
+   				for(Loan l : Loans) {
+   					System.out.println(counter + ")\n" + l.toString());
+   					counter++;
+   				}
+   				System.out.println(counter + ") Return");
+   				int choice = 0;
+   				while (choice < 1 || choice > counter) {
+   					choice = scanner.nextInt();
+   					scanner.nextLine();
+   					if(choice == counter) {
+   						System.out.println("returning");
+   						return;
+   					} else if(choice < 1 || choice > counter) {
+   						System.out.println("Invalid choice");
+   					} else {
+   						Loan currentLoan = Loans.get(choice-1);
+   			   			LoanDAO ldao2 = new LoanDAO(conn);
+   						ldao2.extendLoan(currentLoan);
+   						System.out.println("Loan due date extended by 7 days");
+   					}
+   				}
+   			}
+   		} catch (ClassNotFoundException | SQLException| InputMismatchException e) {
+			e.printStackTrace();
+			return;
+   		}
+	}
 	/*
 	   		try (Connection conn = conUtil.getConnection()){
 	  		//

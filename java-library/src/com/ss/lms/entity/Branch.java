@@ -47,5 +47,9 @@ public class Branch {
 		output += this.branchName + ", " + this.branchAddress + "\n";
 		return output;
 	}
+	
+	public void adminPrint() {
+		System.out.println("branchId: " + branchId  + "= " + this.branchName + ", " + this.branchAddress);
+	}
 }
 

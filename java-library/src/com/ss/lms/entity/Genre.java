@@ -33,5 +33,9 @@ public class Genre {
 	public String toString() {
 		return this.genreName + "\n";
 	}
+	
+	public void adminPrint() {
+		System.out.println("genreId = " + genreId + ", genreName = " + genreName);
+	}
 }
 

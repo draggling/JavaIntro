@@ -312,6 +312,7 @@ public class Menus {
 	public void ADMIN() throws ClassNotFoundException, SQLException {
 		try {
 			while(true) {
+				System.out.println("*************");
 				System.out.println("1) Add/Update/Delete/Read Book");
 				System.out.println("2) Add/Update/Delete/Read Author");
 				System.out.println("3) Add/Update/Delete/Read Genres");
@@ -322,6 +323,7 @@ public class Menus {
 				System.out.println("8) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
+				scanner.nextLine();
 				switch(option) {
 					case(1):
 						Book();
@@ -360,6 +362,8 @@ public class Menus {
 	public void Book() throws ClassNotFoundException, SQLException {
 		try {
 			while(true) {
+				System.out.println("*************");
+				System.out.println("Book Menu");
 				System.out.println("1) Add Book");
 				System.out.println("2) Update Book");
 				System.out.println("3) Delete Book");
@@ -400,11 +404,12 @@ public class Menus {
 	public void Author() throws ClassNotFoundException, SQLException {
 		try {
 			while(true) {
+				System.out.println("*************");
 				System.out.println("Author Menu");
 				System.out.println("1) Add author");
 				System.out.println("2) Update author");
 				System.out.println("3) Delete author");
-				System.out.println("4) Return to Main Menu");
+				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
 				switch(option) {
@@ -418,6 +423,9 @@ public class Menus {
 						AS.deleteAuthor();
 						break;
 					case(4):
+						AS.readAuthors();
+						break;
+					case(5):
 						System.out.println("Returning to main menu...\n");
 						MainMenu();
 						return;
@@ -426,18 +434,20 @@ public class Menus {
 				}
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("Invalid input. Please choose a number from 1 to 4");
+			System.out.println("Invalid input. Please choose a number from 1 to 5");
 		}
 	}
 	
 	public void Genre() throws ClassNotFoundException, SQLException {
 		try {
 			while(true) {
+				System.out.println("*************");
 				System.out.println("Genre Menu");
 				System.out.println("1) Add genre");
 				System.out.println("2) Update genre");
 				System.out.println("3) Delete genre");
-				System.out.println("4) Return to Main Menu");
+				System.out.println("4) Reader genre");
+				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
 				switch(option) {
@@ -451,6 +461,9 @@ public class Menus {
 						AS.deleteGenre();
 						break;
 					case(4):
+						AS.readGenres();
+						break;
+					case(5):
 						System.out.println("Returning to main menu...\n");
 						MainMenu();
 						return;
@@ -459,18 +472,20 @@ public class Menus {
 				}
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("Invalid input. Please choose a number from 1 to 4");
+			System.out.println("Invalid input. Please choose a number from 1 to 5");
 		}
 	}
 
 	public void Publisher() throws ClassNotFoundException, SQLException {
 		try {
 			while(true) {
+				System.out.println("*************");
 				System.out.println("Publisher Menu");
 				System.out.println("1) Add publisher");
 				System.out.println("2) Update publisher");
 				System.out.println("3) Delete publisher");
-				System.out.println("4) Return to Main Menu");
+				System.out.println("4) Read Publishers");
+				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
 				switch(option) {
@@ -484,6 +499,9 @@ public class Menus {
 						AS.deletePublisher();
 						break;
 					case(4):
+						AS.readPublishers();
+						break;
+					case(5):
 						System.out.println("Returning to main menu...\n");
 						MainMenu();
 						return;
@@ -492,18 +510,20 @@ public class Menus {
 				}
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("Invalid input. Please choose a number from 1 to 4");
+			System.out.println("Invalid input. Please choose a number from 1 to 5");
 		}
 	}
 
 	public void Branch() throws ClassNotFoundException, SQLException {
 		try {
 			while(true) {
+				System.out.println("*************");
 				System.out.println("Branch Menu");
 				System.out.println("1) Add branch");
 				System.out.println("2) Update branch");
 				System.out.println("3) Delete branch");
-				System.out.println("4) Return to Main Menu");
+				System.out.println("4) Read branches");
+				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
 				switch(option) {
@@ -517,6 +537,9 @@ public class Menus {
 						AS.deleteBranch();
 						break;
 					case(4):
+						AS.readBranches();
+						break;
+					case(5):
 						System.out.println("Returning to main menu...\n");
 						MainMenu();
 						return;
@@ -525,29 +548,49 @@ public class Menus {
 				}
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("Invalid input. Please choose a number from 1 to 4");
+			System.out.println("Invalid input. Please choose a number from 1 to 5");
 		}
 	}
-	// Add Branch --> branchName must be unique
-	// Delete Branch --> Make sure no books are loaned out from deleted branch
-	// Modify Branch --> 
-		// Book copies
-		// change name, address
-	
-	public void BookCopies(Branch branch) {
-		System.out.println("BookCopies");
-	// modify book copies --> cannot be lower than # loaned out	
-	// delete book copies --> cannot be loaned out
-	}
-	public void Borrower() {
-		System.out.println("Borrower");
-	// create new borrowers --> choose cardNo but must be unique, name, address, phone
-	// delete borrower --> cannot have books loaned out
-	// modify borrower --> name, address, phone
+
+	public void Borrower() throws ClassNotFoundException, SQLException {
+		try {
+			while(true) {
+				System.out.println("*************");
+				System.out.println("Borrower Menu");
+				System.out.println("1) Add borrower");
+				System.out.println("2) Update borrower");
+				System.out.println("3) Delete borrower");
+				System.out.println("4) Read borrowers");
+				System.out.println("5) Return to Main Menu");
+				System.out.print("Choose an option: ");
+				int option = scanner.nextInt();
+				switch(option) {
+					case(1):
+						AS.addBorrower();
+						break;
+					case(2):
+						AS.updateBorrower();
+						break;
+					case(3):
+						AS.deleteBorrower();
+						break;
+					case(4):
+						AS.readBorrowers();
+						break;
+					case(5):
+						System.out.println("Returning to main menu...\n");
+						MainMenu();
+						return;
+					default:
+						System.out.println("Invalid Input");
+				}
+			}
+		} catch(NumberFormatException | InputMismatchException e) {
+			System.out.println("Invalid input. Please choose a number from 1 to 5");
+		}
 	}
 	public void OverrideDueDate() {
 		System.out.println("OverrideDueDate");
-	// print out all loaned books
-		// choose a book to override
+		AS.overrideDueDate();
 	}
 }

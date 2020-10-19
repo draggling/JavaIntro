@@ -17,7 +17,6 @@ public class Loan {
 	private Integer bookId;
 	private Integer branchId;
 	private Integer cardNo;
-	private List<Loan> loans;
 	private Date dateOut;
 	private Date dueDate;
 	private Date dateIn;
@@ -103,10 +102,10 @@ public class Loan {
 	}
 	
 	public String toString() {
-		String output = "";
-		//String output = ("Borrower Info: " + EG.findBorrower(this.cardNo).toString() + "\n");
+		//String output = "";
+		String output = ("Borrower Info: " + EG.findBorrower(this.cardNo).toString() + "\n");
 		output += ("Book Info: " + EG.findBook(this.bookId).toString() + "\n");
-		output += ("Branch Info: " + EG.findBranch(this.branchId).toString() + "\n");
+		output += ("Branch Info: " + EG.findBranch(this.branchId).toString());
 		output += ("Date Out: " + this.dateOut + "\n");
 		output += ("Due Date " + this.dueDate + "\n");
 		return output;

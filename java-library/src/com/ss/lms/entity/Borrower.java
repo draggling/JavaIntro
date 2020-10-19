@@ -67,7 +67,7 @@ public class Borrower {
 		this.loans = EG.findLoans(this.cardNo);
 	}
 	public String toString() {
-		String output = "------------\n";
+		String output = "";
 		if(this.name == null) {
 			output += "NULL NAME";
 		} else {
@@ -84,9 +84,7 @@ public class Borrower {
 		} else {
 			output += "phone: " + this.phone + "\n";
 		}
-		if(this.loans == null) {
-			output += "//no loans//\n";
-		} else {
+		if(this.loans != null) {
 			for(Loan a : this.loans) {
 				output += a.toString();
 			}
@@ -94,5 +92,8 @@ public class Borrower {
 		output += "------------\n";
 		return output;
 	}
-}
+	
+	public void adminPrint() {
+		System.out.println("cardNo : " + cardNo + ", name = " + name + ", address = " + address + ", phone " + phone);
+	}}
 

@@ -25,8 +25,8 @@ public class BorrowerDAO extends BaseDAO<Borrower>{
 		return read("SELECT * from tbl_borrower WHERE cardNo = ?", new Object[] { cardNo }).get(0);
 	}
 	
-	public void addBorrower(Borrower Borrower) throws ClassNotFoundException, SQLException {
-		save("INSERT INTO tbl_borrower (name, address, phone) VALUES (?,?,?)", new Object[] { Borrower.getName(), Borrower.getAddress(), Borrower.getPhone()});
+	public void addBorrower(String borrowerName, String borrowerAddress, String borrowerPhone) throws ClassNotFoundException, SQLException {
+		save("INSERT INTO tbl_borrower (name, address, phone) VALUES (?,?,?)", new Object[] { borrowerName, borrowerAddress, borrowerPhone});
 	}
 	
 	public void updateBorrower(Borrower Borrower) throws ClassNotFoundException, SQLException {
@@ -35,7 +35,7 @@ public class BorrowerDAO extends BaseDAO<Borrower>{
 	}
 
 	public void deleteBorrower(Borrower Borrower) throws ClassNotFoundException, SQLException {
-		save("DELETE FROM tbl_borrower WHERE BorrowerId = ?", new Object[] { Borrower.getCardNo() });
+		save("DELETE FROM tbl_borrower WHERE cardNo = ?", new Object[] { Borrower.getCardNo() });
 	}
 
 	public List<Borrower> readAllBorrowers() throws SQLException, ClassNotFoundException {
@@ -46,8 +46,9 @@ public class BorrowerDAO extends BaseDAO<Borrower>{
 		return read("SELECT * FROM tbl_borrower WHERE cardno = ?", new Object[] {cardNo});
 	}
 	
-	public List<Borrower> readAllBorrowersByName(Integer searchInteger) throws SQLException, ClassNotFoundException {
-		return read("SELECT * FROM tbl_borrower WHERE cardno = ?", new Object[] {searchInteger});
+	public List<Borrower> readAllBorrowersByName(String borrowerName) throws SQLException, ClassNotFoundException {
+		String searchString = "%" + borrowerName + "%";
+		return read("SELECT * FROM tbl_borrower WHERE name LIKE (?)", new Object[] {searchString});
 	}
 	
 	@Override

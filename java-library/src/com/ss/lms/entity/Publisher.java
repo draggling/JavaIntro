@@ -50,5 +50,9 @@ public class Publisher {
 		output += this.publisherName + ", " + this.publisherAddress + " --- " + this.publisherPhone + "\n";
 		return output;
 	}
+	
+	public void adminPrint() {
+		System.out.println("PublisherId: " + publisherId  + ", " + this.publisherName + ", " + this.publisherAddress + " --- " + this.publisherPhone);
+	}
 }
 

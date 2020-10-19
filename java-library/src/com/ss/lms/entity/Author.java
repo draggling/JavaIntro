@@ -38,4 +38,8 @@ public class Author {
 	public void setBooks(List<Book> books) {
 		this.books = books;
 	}
+	
+	public void adminPrint() {
+		System.out.println("authorId = " + authorId + ", AuthorName = " + authorName);
+	}
 }

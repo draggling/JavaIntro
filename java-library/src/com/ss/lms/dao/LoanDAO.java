@@ -44,7 +44,7 @@ public class LoanDAO extends BaseDAO<Loan>{
 		save("UPDATE tbl_book_loans SET dueDate = date_add(dueDate, INTERVAL 7 DAY) WHERE bookId = ? and branchId = ? and cardNo = ?",
 				new Object[] { loan.getBookId(), loan.getBranchId(), loan.getCardNo()});
 	}
-
+	
 	/* all active loans in a specific branch */
 	public List<Loan> readAllActiveBranchLoans(Branch branch) throws SQLException, ClassNotFoundException {
 		return read("SELECT * FROM tbl_book_loans WHERE branchNo = ? and dateIn IS NULL", new Object[] {branch.getBranchId()});
@@ -63,6 +63,11 @@ public class LoanDAO extends BaseDAO<Loan>{
 	public int checkBranchLoanDependency(Branch branch) throws ClassNotFoundException, SQLException {
 		return read("SELECT * FROM tbl_book_loans WHERE branchId = ? and DateIn IS NULL",
 				new Object[] {branch.getBranchId()}).size();
+	}
+	
+	public int checkBorrowerLoanDependency(Borrower borrower) throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_book_loans WHERE cardNo = ? and DateIn IS NULL",
+				new Object[] {(borrower.getCardNo())}).size();
 	}
 	
 	public int getBranchBookLoans(Branch branch, Book book) throws ClassNotFoundException, SQLException {
