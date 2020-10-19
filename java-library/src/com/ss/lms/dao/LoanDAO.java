@@ -60,6 +60,16 @@ public class LoanDAO extends BaseDAO<Loan>{
 		return read("SELECT * FROM tbl_book_loans WHERE dateIn IS NULL", null);
 	}
 	
+	public int checkBranchLoanDependency(Branch branch) throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_book_loans WHERE branchId = ? and DateIn IS NULL",
+				new Object[] {branch.getBranchId()}).size();
+	}
+	
+	public int getBranchBookLoans(Branch branch, Book book) throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_book_loans WHERE branchId = ? and bookId = ? and DateIn IS NULL",
+				new Object[] {branch.getBranchId(), book.getBookId()}).size(); 
+	}
+	
 	@Override
 	public List<Loan> extractData(ResultSet rs) throws SQLException, ClassNotFoundException {
 		List<Loan> Loans = new ArrayList<>();

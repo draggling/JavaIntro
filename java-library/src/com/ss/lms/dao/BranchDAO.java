@@ -27,8 +27,20 @@ public class BranchDAO extends BaseDAO<Branch>{
 		return read("SELECT * from tbl_branch WHERE branchId = ?", new Object[] { branchId }).get(0);
 	}
 	
+	public boolean searchBranchBoolean(String branchName) throws SQLException, ClassNotFoundException {
+		if(read("SELECT * FROM tbl_branch WHERE branchName = (?)", new Object[] {branchName}).size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public void addBranch(Branch Branch) throws ClassNotFoundException, SQLException {
 		save("INSERT INTO tbl_branch (branchName, branchAddress) VALUES (?,?)", new Object[] { Branch.getBranchName(), Branch.getBranchAddress() });
+	}
+	
+	public void addBranch(String branchName, String branchAddress) throws ClassNotFoundException, SQLException {
+		save("INSERT INTO tbl_branch (branchName, branchAddress) VALUES (?,?)", new Object[] { branchName, branchAddress });
 	}
 	
 	/* adds book copies to branch */

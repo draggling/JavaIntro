@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
 import com.ss.lms.entity.Borrower;
 import com.ss.lms.entity.Branch;
@@ -27,6 +28,15 @@ public class PublisherDAO extends BaseDAO<Publisher>{
 		return read("SELECT * FROM tbl_publisher WHERE publisherId = ?", new Object[] { publisherId }).get(0);
 	}
 	
+	
+	public boolean searchPublisherBoolean(String publisherName) throws SQLException, ClassNotFoundException {
+		if(read("SELECT * FROM tbl_publisher WHERE publisherId = (?)", new Object[] {publisherName}).size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public void addPublisher(String publisherName, String publisherAddress, String publisherPhone) throws ClassNotFoundException, SQLException {
 		save("INSERT INTO tbl_publisher (publisherName, publisherAddress, publisherPhone) VALUES (?,?,?)",
 				new Object[] {publisherName, publisherAddress, publisherPhone});
@@ -36,6 +46,15 @@ public class PublisherDAO extends BaseDAO<Publisher>{
 		save("UPDATE tbl_publisher SET publisherName = (?) , publisherAddress = (?) , publisherPhone = (?) WHERE publisherId = ?",
 				new Object[] {publisherName, publisherAddress, publisherPhone, publisherId});
 	}
+	
+	public void deletePublisher(Publisher publisher) throws ClassNotFoundException, SQLException {
+		save("DELETE FROM tbl_publisher WHERE publisherId = ?", new Object[] { publisher.getPublisherId() });
+	}
+	
+	public List<Publisher> getPublishers() throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_publisher", null);
+	}
+	
 	public List<Publisher> getPublishersByName(String publisherName) throws ClassNotFoundException, SQLException {
 		String searchString = "%"+publisherName+"%";
 		return read("SELECT * FROM tbl_publisher WHERE publisherName LIKE (?)", new Object[] {searchString});

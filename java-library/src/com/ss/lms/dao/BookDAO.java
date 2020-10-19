@@ -10,8 +10,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
 import com.ss.lms.entity.Branch;
+import com.ss.lms.entity.Genre;
+import com.ss.lms.entity.Publisher;
 
 /**
  * @book danwoo
@@ -73,6 +76,27 @@ public class BookDAO extends BaseDAO<Book>{
 		} else {
 			return false;
 		}
+	}
+		
+	public int checkBookPublisherDependency(Publisher publisher) throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_book b WHERE 1 <= "
+				+ "(SELECT COUNT(*) FROM tbl_book b2 WHERE b2.bookId = b.bookId and EXISTS ("
+				+ "SELECT * FROM tbl_book b3 WHERE b2.bookId = b3.bookId and b3.pubId = ?))",
+				new Object[] {publisher.getPublisherId()}).size();
+	}
+	
+	public int checkBookSingleAuthor(Author author) throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_book b WHERE 1 <= "
+				+ "(SELECT COUNT(*) FROM tbl_book_authors ba WHERE ba.bookId = b.bookId and EXISTS ("
+				+ "SELECT * FROM tbl_book_authors ba2 WHERE ba.bookId = ba2.bookId and ba2.authorId = ?))",
+				new Object[] {author.getAuthorId()}).size();
+	}
+	
+	public int checkBookSingleGenre(Genre genre) throws ClassNotFoundException, SQLException {
+		return read("SELECT * FROM tbl_book b WHERE 1 <= "
+				+ "(SELECT COUNT(*) FROM tbl_book_genres bg WHERE bg.bookId = b.bookId and EXISTS ("
+				+ "SELECT * FROM tbl_book_genres bg2 WHERE bg.bookId = bg2.bookId and bg2.genreId = ?))",
+				new Object[] {genre.getGenreId()}).size();
 	}
 	
 	public List<Book> readAllBooksByName(String searchString) throws SQLException, ClassNotFoundException {

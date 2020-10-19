@@ -28,9 +28,9 @@ public class GenreDAO extends BaseDAO<Genre>{
 		return read("SELECT * FROM tbl_genre WHERE genreId = ?", new Object[] { genreId }).get(0);
 	}
 	
-	public void addGenre(String genreName, String publisherAddress, String publisherPhone) throws ClassNotFoundException, SQLException {
-		save("INSERT INTO tbl_genre (genreName, publisherAddress, publisherPhone) VALUES (?,?,?)",
-				new Object[] {genreName, publisherAddress, publisherPhone});
+	public void addGenre(String genreName) throws ClassNotFoundException, SQLException {
+		save("INSERT INTO tbl_genre (genreName) VALUES (?)",
+				new Object[] {genreName});
 	}	
 	
 	public void removeGenre(Genre genre) throws ClassNotFoundException, SQLException {
@@ -40,18 +40,29 @@ public class GenreDAO extends BaseDAO<Genre>{
 		return read("SELECT * FROM tbl_genre WHERE genreName = (?)", new Object[] {genreName});
 	}
 	
-	public void updateGenre(Integer genreId, String genreName) throws ClassNotFoundException, SQLException {
+	public void updateGenre(Genre genre) throws ClassNotFoundException, SQLException {
 		save("UPDATE tbl_genre SET genreName = (?) WHERE genreId = ?",
-				new Object[] {genreName, genreId});
+				new Object[] {genre.getGenreName(), genre.getGenreId()});
 	}
 	
 	public List<Genre> readAllGenres() throws SQLException, ClassNotFoundException {
 		return read("SELECT * FROM tbl_genre", null);
 	}
+	public List<Genre> readAllGenresByName(String searchString) throws SQLException, ClassNotFoundException {
+		searchString = "%"+searchString+"%";
+		return read("SELECT * FROM tbl_genre WHERE genreName LIKE (?)", new Object[] {searchString});
+	}
 	public List<Genre> searchGenre(String searchString) throws SQLException, ClassNotFoundException {
 		return read("SELECT * FROM tbl_genre WHERE genreName = ?", new Object[] {searchString});
 	}
 	
+	public boolean searchGenreBoolean(String genreName) throws SQLException, ClassNotFoundException {
+		if(read("SELECT * FROM tbl_genre WHERE genreName = (?)", new Object[] {genreName}).size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	public boolean findBookGenrePair(Integer bookId, Integer genreId) throws ClassNotFoundException, SQLException {
 		if(read("SELECT * FROM tbl_book_genres WHERE bookId = ? and genreId = ?", new Object[] {bookId, genreId}).size() == 1) {

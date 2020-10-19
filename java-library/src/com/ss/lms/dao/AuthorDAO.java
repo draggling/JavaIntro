@@ -21,8 +21,8 @@ public class AuthorDAO extends BaseDAO<Author> {
 		super(conn);
 	}
 
-	public void addAuthor(Author author) throws ClassNotFoundException, SQLException {
-		save("INSERT INTO tbl_author (authorName) VALUES (?)", new Object[] { author.getAuthorName() });
+	public void addAuthor(String authorName) throws ClassNotFoundException, SQLException {
+		save("INSERT INTO tbl_author (authorName) VALUES (?)", new Object[] { authorName });
 	}
 
 	public void updateAuthor(Author author) throws ClassNotFoundException, SQLException {
@@ -37,10 +37,21 @@ public class AuthorDAO extends BaseDAO<Author> {
 	public void deleteBookAuthorPair(Integer bookId, Integer authorId) throws ClassNotFoundException, SQLException {
 		save("DELETE FROM tbl_book_authors WHERE bookId = ? and authorId = ?", new Object[] {bookId, authorId});
 	}
-	
 
 	public List<Author> readAllAuthors() throws SQLException, ClassNotFoundException {
 		return read("SELECT * FROM tbl_author", null);
+	}
+	public boolean searchAuthorBoolean(String authorName) throws SQLException, ClassNotFoundException {
+		if(read("SELECT * FROM tbl_author WHERE authorName = (?)", new Object[] {authorName}).size() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public List<Author> readAllAuthorsByName(String searchString) throws SQLException, ClassNotFoundException {
+		searchString = "%"+searchString+"%";
+		return read("SELECT * FROM tbl_author WHERE authorName LIKE (?)", new Object[] {searchString});
 	}
 	
 	public List<Author> searchAuthor(String searchString) throws SQLException, ClassNotFoundException {

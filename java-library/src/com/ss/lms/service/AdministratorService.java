@@ -11,16 +11,19 @@ import java.util.Scanner;
 import com.ss.lms.dao.AuthorDAO;
 import com.ss.lms.dao.BranchDAO;
 import com.ss.lms.dao.GenreDAO;
+import com.ss.lms.dao.LoanDAO;
 import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.dao.BookDAO;
 
 import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
+import com.ss.lms.entity.Branch;
 import com.ss.lms.entity.Genre;
 import com.ss.lms.entity.Publisher;
 
 public class AdministratorService {
 
+	LibrarianService LS = new LibrarianService();
 	public ConnectionUtil conUtil = new ConnectionUtil();
 	Scanner scanner = new Scanner(System.in);
 
@@ -29,7 +32,6 @@ public class AdministratorService {
 		String title = "";
 		Integer publisherId = 0;
 		String publisherName = "";
-		List<Author> authors = new ArrayList<>();
 		try (Connection conn = conUtil.getConnection()){
 			BookDAO bdao = new BookDAO(conn);
 			AuthorDAO adao = new AuthorDAO(conn);
@@ -179,10 +181,7 @@ public class AdministratorService {
 	public Book updateBook() throws ClassNotFoundException, SQLException {
 		int count;
 		try (Connection conn = conUtil.getConnection()){
-			BookDAO bdao = new BookDAO(conn);
 			PublisherDAO pdao = new PublisherDAO(conn);
-			AuthorDAO adao = new AuthorDAO(conn);
-			GenreDAO gdao = new GenreDAO(conn);
 			Book book = readBook(chooseBook());
 			System.out.println("\nWhat do you want to change about the book? ");
 			System.out.println("1) Title");
@@ -216,7 +215,6 @@ public class AdministratorService {
 								System.out.print("Publisher Name: ");
 								String publisherName = scanner.nextLine();
 								try (Connection conn3 = conUtil.getConnection()){
-									PublisherDAO pdao2 = new PublisherDAO(conn3);
 									List<Publisher> temp = pdao.getPublishersByName(publisherName);
 									if(temp.size() == 0) {
 										System.out.println("No publisher found");
@@ -381,7 +379,6 @@ public class AdministratorService {
 						case(1):
 							/* find set difference of all genres and book's genres */
 							try (Connection conn3 = conUtil.getConnection()){
-								BookDAO bdao3 = new BookDAO(conn);
 								GenreDAO gdao2 = new GenreDAO(conn);
 								List<Genre> remainingGenres = gdao2.readAllGenres();
 								List<Genre> bookGenres = book.getGenres();
@@ -470,7 +467,6 @@ public class AdministratorService {
 	/* propagates book data */
 	public Book readBook(Book book) throws ClassNotFoundException {
 		try (Connection conn = conUtil.getConnection()){
-			BookDAO bdao = new BookDAO(conn);
 			PublisherDAO pdao = new PublisherDAO(conn);
 			AuthorDAO adao = new AuthorDAO(conn);
 			GenreDAO gdao = new GenreDAO(conn);
@@ -566,11 +562,682 @@ public class AdministratorService {
 	}
 	
 	/* AUTHOR FUNCTIONS */
+	public void addAuthor() {
+		boolean unique = false;
+   		try (Connection conn = conUtil.getConnection()){
+   			AuthorDAO adao = new AuthorDAO(conn);
+   			String input = "";
+   			while(!unique) {
+   	   			System.out.println("New author name");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			} else {
+   	   				unique = !adao.searchAuthorBoolean(input);
+   	   				if(!unique) {
+   	   					System.out.println("Author name already exists");
+   	   				}
+   	   			}
+   			}
+   			adao.addAuthor(input);
+   			System.out.println("Author added");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			System.out.println("Could not add author");
+ 			return;
+ 		}
+	}
+	public void updateAuthor() {
+		boolean unique = false;
+   		try (Connection conn = conUtil.getConnection()){
+   			AuthorDAO adao = new AuthorDAO(conn);
+   			List<Author> Authors;
+   			Author author = null;
+   			String input = "";
+	   		int count = 1;
+	   		/* get authorId */
+   			while(author == null) {
+   	   			System.out.println("Choose Author by keyword (leave blank to see a list of all authors)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Authors = adao.readAllAuthors();
+   	   			} else {
+   	   				Authors = adao.readAllAuthorsByName(input);
+   	   			}
+   	   			/* create author list to choose from */
+   	   			if(Authors.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Authors.size() == 1) {
+   	   				author = Authors.get(0);
+   	   				System.out.println("Author name = " + author.getAuthorName());
+   	   			} else {
+					System.out.println("Choose an Author to update:");
+					count = 1;
+					for(Author a: Authors) {
+						System.out.println(count + ") " + a.getAuthorName());
+						count++;
+					}
+					System.out.print("Choose an author to add to book (from the integer list): ");
+					int authorOption = 0;
+					while(authorOption < 1 || authorOption >= count) {
+						try {
+							authorOption = scanner.nextInt();
+							scanner.nextLine();
+							if(authorOption < 1 || authorOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								author = Authors.get(authorOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+							break;
+						}
+					}
+   	   			}
+   			}
+   			/* update Author Name using authorId and authorName */
+   			while(!unique) {
+   	   			System.out.println("New Author Name");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			} else {
+   	   				unique = !adao.searchAuthorBoolean(input);
+   	   				if(!unique) {
+   	   					System.out.print("Author with this name already exists");
+   	   				}
+   	   			}
+   			}
+   			author.setAuthorName(input);
+   			adao.updateAuthor(author);
+   			System.out.println("Author updated");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			e.printStackTrace();
+ 			System.out.println("Could not add author");
+ 			return;
+ 		}
+	}
+	
+	public void deleteAuthor( ){
+   		try (Connection conn = conUtil.getConnection()){
+   			AuthorDAO adao = new AuthorDAO(conn);
+   			List<Author> Authors;
+   			Author author = null;
+   			int count = 0;
+   			String input;
+			while(author == null) {
+   	   			System.out.println("Choose Author by keyword (leave blank to see a list of all authors)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Authors = adao.readAllAuthors();
+   	   			} else {
+   	   				Authors = adao.readAllAuthorsByName(input);
+   	   			}
+   	   			/* create author list to choose from */
+   	   			if(Authors.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Authors.size() == 1) {
+   	   				author = Authors.get(0);
+   	   			} else {
+					System.out.println("Choose an Author to update:");
+					count = 1;
+					for(Author a: Authors) {
+						System.out.println(count + ") " + a.getAuthorName());
+						count++;
+					}
+					System.out.print("Choose an author to delete (from the integer list): ");
+					int authorOption = 0;
+					while(authorOption < 1 || authorOption >= count) {
+						try {
+							authorOption = scanner.nextInt();
+							scanner.nextLine();
+							if(authorOption < 1 || authorOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								author = Authors.get(authorOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+						}
+					}
+   	   			}
+			}
+   	   		/* check to see if author has dependencies */
+			BookDAO bdao = new BookDAO(conn);
+			/* probably doesn't work */
+			int dependencies = bdao.checkBookSingleAuthor(author);
+			if(dependencies == 0) {
+				adao.deleteAuthor(author);
+				System.out.println("Author Deleted");
+				return;
+			} else {
+				System.out.println("ERROR: Author has " + dependencies + " dependencies");
+				return;
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+	
 	/* GENRE FUNCTIONS */
+	public void addGenre() {
+		boolean unique = false;
+   		try (Connection conn = conUtil.getConnection()){
+   			GenreDAO gdao = new GenreDAO(conn);
+   			String input = "";
+   			while(!unique) {
+   	   			System.out.println("New genre name");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			} else {
+   	   				unique = !gdao.searchGenreBoolean(input);
+   	   				if(!unique) {
+   	   					System.out.println("Genre name already exists");
+   	   				}
+   	   			}
+   			}
+   			gdao.addGenre(input);
+   			System.out.println("Genre added");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			System.out.println("Could not add genre");
+ 			return;
+ 		}
+	}
+	public void updateGenre() {
+		boolean unique = false;
+   		try (Connection conn = conUtil.getConnection()){
+   			GenreDAO gdao = new GenreDAO(conn);
+   			List<Genre> Genres;
+   			Genre genre = null;
+   			String input = "";
+   			int genreId = 0;
+	   		int count = 1;
+	   		/* get genreId */
+   			while(genre == null) {
+   	   			System.out.println("Choose Genre by keyword (leave blank to see a list of all genres)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Genres = gdao.readAllGenres();
+   	   			} else {
+   	   				Genres = gdao.readAllGenresByName(input);
+   	   			}
+   	   			/* create genre list to choose from */
+   	   			if(Genres.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Genres.size() == 1) {
+   	   				genre = Genres.get(0);
+   	   				System.out.println("Genre name = " + genre.getGenreName());
+   	   			} else {
+					System.out.println("Choose a Genre to update:");
+					count = 1;
+					for(Genre b: Genres) {
+						System.out.println(count + ") " + b.getGenreName());
+						count++;
+					}
+					System.out.print("Choose a genre to add to book (from the integer list): ");
+					int genreOption = 0;
+					while(genreOption < 1 || genreOption >= count) {
+						try {
+							genreOption = scanner.nextInt();
+							scanner.nextLine();
+							if(genreOption < 1 || genreOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								genre = Genres.get(genreOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+							break;
+						}
+					}
+   	   			}
+   			}
+   			/* update Genre Name using genreId and genreName */
+   			while(!unique) {
+   	   			System.out.println("New Genre Name");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			} else {
+   	   				unique = !gdao.searchGenreBoolean(input);
+   	   				if(!unique) {
+   	   					System.out.print("Genre with this name already exists");
+   	   				}
+   	   			}
+   			}
+   			genre.setGenreName(input);
+   			gdao.updateGenre(genre);
+   			System.out.println("Genre updated");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			e.printStackTrace();
+ 			System.out.println("Could not add genre");
+ 			return;
+ 		}
+	}
+	
+	public void deleteGenre( ){
+   		try (Connection conn = conUtil.getConnection()){
+   			GenreDAO gdao = new GenreDAO(conn);
+   			List<Genre> Genres;
+   			Genre genre = null;
+   			int count = 0;
+   			String input;
+			while(genre == null) {
+   	   			System.out.println("Choose Genre by keyword (leave blank to see a list of all genres)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Genres = gdao.readAllGenres();
+   	   			} else {
+   	   				Genres = gdao.readAllGenresByName(input);
+   	   			}
+   	   			/* create genre list to choose from */
+   	   			if(Genres.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Genres.size() == 1) {
+   	   				genre = Genres.get(0);
+   	   			} else {
+					System.out.println("Choose an Genre to update:");
+					count = 1;
+					for(Genre a: Genres) {
+						System.out.println(count + ") " + a.getGenreName());
+						count++;
+					}
+					System.out.print("Choose an genre to delete (from the integer list): ");
+					int genreOption = 0;
+					while(genreOption < 1 || genreOption >= count) {
+						try {
+							genreOption = scanner.nextInt();
+							scanner.nextLine();
+							if(genreOption < 1 || genreOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								genre = Genres.get(genreOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+						}
+					}
+   	   			}
+			}
+   	   		/* check to see if genre has dependencies */
+			BookDAO bdao = new BookDAO(conn);
+			/* probably doesn't work */
+			int dependencies = bdao.checkBookSingleGenre(genre);
+			if(dependencies == 0) {
+				gdao.removeGenre(genre);
+				System.out.println("Genre Deleted");
+				return;
+			} else {
+				System.out.println("ERROR: Genre has " + dependencies + " dependencies");
+				return;
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+	
 	/* PUBLISHER FUNCTIONS */
+	public void addPublisher() {
+		boolean unique = false;
+		String publisherName = "";
+		String publisherAddress = "";
+		String publisherPhone = "";
+   		try (Connection conn = conUtil.getConnection()){
+   			PublisherDAO pdao = new PublisherDAO(conn);
+   			/* get publisher name */
+   			while(!unique) {
+   	   			System.out.println("New publisher name: ");
+   	   			publisherName = scanner.nextLine();
+   	   			if(publisherName.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			} else {
+   	   				unique = !pdao.searchPublisherBoolean(publisherName);
+   	   				if(!unique) {
+   	   					System.out.println("Publisher name already exists");
+   	   				}
+   	   			}
+   			}
+   			/* get publisher address */
+   			while(publisherAddress.isEmpty()) {
+   	   			System.out.print("New publisher address:");
+   	   			publisherAddress = scanner.nextLine();
+   	   			if(publisherAddress.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			}
+   	   		}
+   			/* get publisher phone */
+   			unique = false;
+   			while(publisherPhone.isEmpty()) {
+   	   			System.out.print("New publisher phone:");
+   	   			publisherPhone = scanner.nextLine();
+   	   			if(publisherPhone.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			}
+   	   		}
+   			pdao.addPublisher(publisherName, publisherAddress, publisherPhone);
+   			System.out.println("Publisher added");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			System.out.println("Could not add publisher");
+ 			return;
+ 		}
+	}
+	public void updatePublisher() {
+		boolean unique = false;
+   		try (Connection conn = conUtil.getConnection()){
+   			PublisherDAO pdao = new PublisherDAO(conn);
+   			List<Publisher> Publishers;
+   			Publisher publisher = null;
+   			String input = "";
+   			int publisherId = 0;
+	   		int count = 1;
+	   		/* get publisherId */
+   			while(publisher == null) {
+   	   			System.out.println("Choose Publisher by keyword (leave blank to see a list of all publishers)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Publishers = pdao.getPublishers();
+   	   			} else {
+   	   				Publishers = pdao.getPublishersByName(input);
+   	   			}
+   	   			/* create publisher list to choose from */
+   	   			if(Publishers.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Publishers.size() == 1) {
+   	   				publisher = Publishers.get(0);
+   	   				System.out.println("Publisher name = " + publisher.getPublisherName() + ", "
+   	   						+ publisher.getPublisherAddress() + ": " + publisher.getPublisherPhone());
+   	   			} else {
+					System.out.println("Publishers:");
+					count = 1;
+					for(Publisher p: Publishers) {
+						System.out.println(count + ") " + p.getPublisherName() + ", " + p.getPublisherAddress() + ": " + p.getPublisherPhone());
+						count++;
+					}
+					System.out.print("Choose a publisher to update (from the integer list): ");
+					int publisherOption = 0;
+					while(publisherOption < 1 || publisherOption >= count) {
+						try {
+							publisherOption = scanner.nextInt();
+							scanner.nextLine();
+							if(publisherOption < 1 || publisherOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								publisher = Publishers.get(publisherOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+							break;
+						}
+					}
+   	   			}
+   			}
+   			/* update Publisher Name using publisherId and publisherName */
+   			while(!unique) {
+   	   			System.out.println("New Publisher Name: (leave blank if no change)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty() || input.equalsIgnoreCase(publisher.getPublisherName())) {
+   	   				System.out.println("Continuing...");
+   	   				unique = true;
+   	   			} else {
+   	   				unique = !pdao.searchPublisherBoolean(input);
+   	   				if(!unique) {
+   	   					System.out.print("Publisher with this name already exists");
+   	   				}
+   	   			}
+   			}
+   			publisher.setPublisherName(input);
+   			/* update Publisher address */
+	   		System.out.println("New Publisher Address: (leave blank if no change)");
+	   		input = scanner.nextLine();
+	   		if(input.isEmpty() || input.equalsIgnoreCase(publisher.getPublisherAddress())) {
+	   			System.out.println("Continuing...");
+	   		} else if(input.length() <= 45) {
+	   			publisher.setPublisherAddress(input);
+	   		} else {
+	   			System.out.println("Address is too long... skipping");
+	   		}
+   			/* update Publisher phone */
+	   		System.out.println("New Publisher Phone: (leave blank if no change)");
+	   		input = scanner.nextLine();
+	   		if(input.isEmpty() || input.equalsIgnoreCase(publisher.getPublisherPhone())) {
+	   			System.out.println("Continuing...");
+	   		} else if(input.length() <= 45) {
+	   			publisher.setPublisherPhone(input);
+	   		} else {
+	   			System.out.println("Phone Number is too long... skipping");
+	   		}
+   			pdao.updatePublisher(publisher.getPublisherId(), publisher.getPublisherName(), publisher.getPublisherAddress(), publisher.getPublisherPhone());
+   			System.out.println("Publisher updated");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			e.printStackTrace();
+ 			System.out.println("Could not add publisher");
+ 			return;
+ 		}
+	}
+	
+	public void deletePublisher( ){
+   		try (Connection conn = conUtil.getConnection()){
+   			PublisherDAO pdao = new PublisherDAO(conn);
+   			List<Publisher> Publishers;
+   			Publisher publisher = null;
+   			int count = 0;
+   			String input;
+			while(publisher == null) {
+   	   			System.out.println("Choose Publisher by keyword (leave blank to see a list of all publishers)");
+   	   			input = scanner.nextLine();
+   	   			if(input.isEmpty()) {
+   	   				Publishers = pdao.getPublishers();
+   	   			} else {
+   	   				Publishers = pdao.getPublishersByName(input);
+   	   			}
+   	   			/* create publisher list to choose from */
+   	   			if(Publishers.size() == 0) {
+   	   				System.out.println("Invalid search. Try again.");
+   	   			} else if(Publishers.size() == 1) {
+   	   				publisher = Publishers.get(0);
+   	   			} else {
+					System.out.println("Choose an Publisher to update:");
+					count = 1;
+					for(Publisher p: Publishers) {
+						System.out.println(count + ") " + p.getPublisherName() + ", " + p.getPublisherAddress() + ": " + p.getPublisherPhone());
+						count++;
+					}
+					System.out.print("Choose an publisher to delete (from the integer list): ");
+					int publisherOption = 0;
+					while(publisherOption < 1 || publisherOption >= count) {
+						try {
+							publisherOption = scanner.nextInt();
+							scanner.nextLine();
+							if(publisherOption < 1 || publisherOption >= count) {
+								System.out.println("Out of Bounds");
+							} else {
+								publisher = Publishers.get(publisherOption-1);
+							}
+						} catch(InputMismatchException e) {
+							System.out.println("ERROR: integer required");
+						}
+					}
+   	   			}
+			}
+   	   		/* check to see if publisher has dependencies */
+			BookDAO bdao = new BookDAO(conn);
+			/* probably doesn't work */
+			int dependencies = bdao.checkBookPublisherDependency(publisher);
+			if(dependencies == 0) {
+				pdao.deletePublisher(publisher);
+				System.out.println("Publisher Deleted");
+				return;
+			} else {
+				System.out.println("ERROR: Publisher has " + dependencies + " dependencies");
+				return;
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
 	/* BRANCH FUNCTIONS */
+	public void addBranch() {
+		boolean unique = false;
+		String branchName = "";
+		String branchAddress = "";
+   		try (Connection conn = conUtil.getConnection()){
+   			BranchDAO brdao = new BranchDAO(conn);
+   			/* get branch name */
+   			while(!unique) {
+   	   			System.out.println("New branch name: ");
+   	   			branchName = scanner.nextLine();
+   	   			if(branchName.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			} else {
+   	   				unique = !brdao.searchBranchBoolean(branchName);
+   	   				if(!unique) {
+   	   					System.out.println("Branch name already exists");
+   	   				}
+   	   			}
+   			}
+   			/* get branch address */
+   			while(branchAddress.isEmpty() || branchAddress.length() > 45) {
+   	   			System.out.print("New branch address:");
+   	   			branchAddress = scanner.nextLine();
+   	   			if(branchAddress.isEmpty()) {
+   	   				System.out.println("Cannot be blank");
+   	   			}
+   	   		}
+   			
+   			brdao.addBranch(branchName, branchAddress);
+   			System.out.println("Branch added");
+   			return;
+ 		} catch (ClassNotFoundException | SQLException e) {
+ 			System.out.println("Could not add branch");
+ 			return;
+ 		}
+	}
+	
+	public void updateBranch() {
+		/* retrieves all branches */
+		int option = 1;
+		Branch branch = null;
+		List<Branch> branches = LS.getBranches();
+		for(Branch br : branches) {
+			System.out.println(option + ") " + br.getBranchName() + ", " + br.getBranchAddress());
+			option++;
+		}
+		/* choose branch */
+		System.out.println(option + ") Return");
+		while(branch == null) {
+			try {
+				int input = scanner.nextInt();
+				scanner.nextLine();
+				if(input == option) {
+					System.out.println("returning...");
+					return;
+				} else if(input > 0 && input < option) {
+					branch = branches.get(input - 1);
+				} else {
+					System.out.println("Invalid input. Please choose a number from 1 to " + option);
+				}
+			} catch(NumberFormatException | InputMismatchException e) {
+				System.out.println("Invalid input" + option);
+				return;
+			}
+		}
+		System.out.println("Would you like to update the library's name and address or add/remove book copies?"
+				+ "\n1) update library name/address"
+				+ "\n2) modify book copies"
+				+ "\n3) return");
+		int answer = 0;
+		while (answer < 1 | answer > 3) {
+			answer = scanner.nextInt();
+			scanner.nextLine();
+			if(answer == 3) {
+				System.out.println("returning...");
+			} else if(answer < 1 | answer > 3) {
+				System.out.println("Invalid answer");
+			}
+		}
+		if(answer == 1) updateBranchDetails(branch);
+		if(answer == 2) setBookCopies(branch);
+	}
+	public void deleteBranch() {
+		int option = 1;
+		Branch branch = null;
+		List<Branch> branches = LS.getBranches();
+		for(Branch br : branches) {
+			System.out.println(option + ") " + br.getBranchName() + ", " + br.getBranchAddress());
+			option++;
+		}
+		/* choose branch */
+		System.out.println(option + ") Return");
+		while(branch == null) {
+			try {
+				int input = scanner.nextInt();
+				scanner.nextLine();
+				if(input == option) {
+					System.out.println("returning...");
+					return;
+				} else if(input > 0 && input < option) {
+					branch = branches.get(input - 1);
+				} else {
+					System.out.println("Invalid input. Please choose a number from 1 to " + option);
+				}
+			} catch(NumberFormatException | InputMismatchException e) {
+				System.out.println("Invalid input" + option);
+				return;
+			}
+		}
+		/* check branch dependencies (books cannot be loaned out from this branch) */
+		try (Connection conn = conUtil.getConnection()){
+			LoanDAO ldao = new LoanDAO(conn);
+			BranchDAO brDAO = new BranchDAO(conn);
+			int dependencies = ldao.checkBranchLoanDependency(branch);
+			if(dependencies == 0) {
+				brDAO.deleteBranch(branch);
+				System.out.println("Branch deleted");
+			} else {
+				System.out.println("ERROR: There are " + dependencies + " books currently loaned out from this branch");
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+	/* BRANCH HELPER FUNCTIONS */
+	public void updateBranchDetails(Branch branch) {
+		LS.UpdateLibrary(branch);
+	}
+	public void setBookCopies(Branch branch) {
+		try (Connection conn = conUtil.getConnection()){
+			LoanDAO ldao = new LoanDAO(conn);
+			/* get book */
+			Book book = readBook(chooseBook());
+			
+	 	} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		//readAllBooksByName
+	}
 	/* BOOK COPY FUNCTIONS */
 	/* BORROWER FUNCTIONS */
 	/* OVERRIDE DUE DATE */
+	
+	/*
+	   		try (Connection conn = conUtil.getConnection()){
+	  		//
+	 			} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	*/
 
 }
