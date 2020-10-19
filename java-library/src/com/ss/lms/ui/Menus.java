@@ -141,10 +141,11 @@ public class Menus {
 
 	public void BORR1() throws ClassNotFoundException, SQLException {
 		BorrowerService BS = new BorrowerService();
-		try {
-			while(true) {
+		while(true) {
+			try {
 				System.out.print("Please enter a valid card number: ");
 				int card = scanner.nextInt();
+				scanner.nextLine();
 				Borrower user = BS.ValidateCard(card);
 				if(user != null) {
 					user.setLoans();
@@ -156,9 +157,10 @@ public class Menus {
 				} else {
 					System.out.println("Invalid number");
 				}
+			} catch(NumberFormatException | InputMismatchException e) {
+				System.out.println("error: a library card is an integer");
+				scanner.nextLine();
 			}
-		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("error: a library card is an integer");
 		}
 	}
 	
@@ -170,6 +172,7 @@ public class Menus {
 						+ "\n3) quit to previous"
 						+ "\nWhat would you like to do? ");
 				int input = scanner.nextInt();
+				scanner.nextLine();
 				switch(input) {
 					case(1):
 						Checkout(user);
@@ -186,6 +189,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Please input a number from 1 to 3");
+			scanner.nextLine();
 		}
 	}
 	
@@ -211,6 +215,7 @@ public class Menus {
 				}
 			} catch(NumberFormatException | InputMismatchException e) {
 				System.out.println("Invalid input. Please choose a number from 1 to " + option);
+				scanner.nextLine();
 			} finally {
 				
 			}
@@ -254,6 +259,7 @@ public class Menus {
 							}
 						} catch(NumberFormatException | InputMismatchException e) {
 							System.out.println("Invalid Input");
+							scanner.nextLine();
 						}
 						break;
 					case(2):
@@ -274,6 +280,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid Answer");
+			scanner.nextLine();
 		}
 	}
 	public void Checkin(Borrower user) throws ClassNotFoundException, SQLException {
@@ -305,6 +312,7 @@ public class Menus {
 				}
 			} catch(NumberFormatException | InputMismatchException e) {
 				System.out.println("Invalid input. Please choose a number from 1 to " + counter);
+				scanner.nextLine();
 			}
 		}
 	}
@@ -356,6 +364,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 8");
+			scanner.nextLine();
 		}
 	}
 	
@@ -394,6 +403,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 5");
+			scanner.nextLine();
 		}
 	// Add book --> book title is unique
 		// choose publisher, book title, author(s), genre(s)
@@ -409,6 +419,7 @@ public class Menus {
 				System.out.println("1) Add author");
 				System.out.println("2) Update author");
 				System.out.println("3) Delete author");
+				System.out.println("4) Read author");
 				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
@@ -435,6 +446,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 5");
+			scanner.nextLine();
 		}
 	}
 	
@@ -446,7 +458,7 @@ public class Menus {
 				System.out.println("1) Add genre");
 				System.out.println("2) Update genre");
 				System.out.println("3) Delete genre");
-				System.out.println("4) Reader genre");
+				System.out.println("4) Read genre");
 				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
@@ -473,6 +485,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 5");
+			scanner.nextLine();
 		}
 	}
 
@@ -511,6 +524,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 5");
+			scanner.nextLine();
 		}
 	}
 
@@ -549,6 +563,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 5");
+			scanner.nextLine();
 		}
 	}
 
@@ -587,6 +602,7 @@ public class Menus {
 			}
 		} catch(NumberFormatException | InputMismatchException e) {
 			System.out.println("Invalid input. Please choose a number from 1 to 5");
+			scanner.nextLine();
 		}
 	}
 	public void OverrideDueDate() {

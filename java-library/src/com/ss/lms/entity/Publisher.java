@@ -52,7 +52,7 @@ public class Publisher {
 	}
 	
 	public void adminPrint() {
-		System.out.println("PublisherId: " + publisherId  + ", " + this.publisherName + ", " + this.publisherAddress + " --- " + this.publisherPhone);
+		System.out.println("PublisherId: " + publisherId  + ", name = " + this.publisherName + ", address = " + this.publisherAddress + ", phone = " + this.publisherPhone);
 	}
 }
 

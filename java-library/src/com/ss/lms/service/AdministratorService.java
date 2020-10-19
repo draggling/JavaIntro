@@ -50,6 +50,7 @@ public class AdministratorService {
 				}
 			} catch(InputMismatchException e) {
 				System.out.println("Invalid title");
+				scanner.nextLine();
 			}
 			/* get publisher */
 			try {
@@ -81,6 +82,7 @@ public class AdministratorService {
 							}
 						} catch(NumberFormatException | InputMismatchException e) {
 							System.out.println("Invalid input: please input an integer");
+							scanner.nextLine();
 						}
 					} else {
 						System.out.println("ERROR - Exiting");
@@ -89,6 +91,7 @@ public class AdministratorService {
 				}
 			} catch(InputMismatchException | SQLException e) {
 				System.out.println("Invalid input. Please choose a number from 1 to 5");
+				scanner.nextLine();
 			}
 			
 			/* generate book */
@@ -133,6 +136,7 @@ public class AdministratorService {
 					}
 				} catch(InputMismatchException | SQLException e) {
 					System.out.println("Invalid Author");
+					scanner.nextLine();
 				}
 			}
 			/* get genres  */
@@ -172,6 +176,7 @@ public class AdministratorService {
 					}
 				} catch(InputMismatchException | SQLException e) {
 					System.out.println("Invalid Genre");
+					scanner.nextLine();
 				}
 			}
 		/* commit all changes */
@@ -254,10 +259,12 @@ public class AdministratorService {
 											}
 										} catch(NumberFormatException | InputMismatchException e) {
 											System.out.println("Invalid input: please input an integer");
+											scanner.nextLine();
 										}
 									}
 								} catch(NumberFormatException | InputMismatchException e) {
-									e.printStackTrace();
+									System.out.println("Invalid input: please input an integer");
+									scanner.nextLine();
 								}
 							}
 						} catch(InputMismatchException | SQLException e) {
@@ -280,7 +287,8 @@ public class AdministratorService {
 									System.out.println("Input out of bounds.");
 								}
 							} catch(InputMismatchException e) {
-								System.out.println("Input a ");
+								System.out.println("Input an integer");
+								scanner.nextLine();
 							}
 						}
 						System.out.println("Authors: ");
@@ -318,6 +326,7 @@ public class AdministratorService {
 										}
 									} catch(InputMismatchException e) {
 										System.out.println("ERROR: integer required");
+										scanner.nextLine();
 									}
 								}
 							} catch (ClassNotFoundException | SQLException e) {
@@ -350,6 +359,7 @@ public class AdministratorService {
 										}
 									} catch(InputMismatchException e) {
 										System.out.println("ERROR: integer required");
+										scanner.nextLine();
 									}
 								}
 							}
@@ -370,7 +380,8 @@ public class AdministratorService {
 									System.out.println("Input out of bounds.");
 								}
 							} catch(InputMismatchException e) {
-								System.out.println("Input a ");
+								System.out.println("Input an Integer ");
+								scanner.nextLine();
 							}
 						}
 						System.out.println("Authors: ");
@@ -418,6 +429,7 @@ public class AdministratorService {
 									} catch(InputMismatchException e) {
 										System.out.println("ERROR: integer required");
 										genreOption = 0;
+										scanner.nextLine();
 									}
 								}
 							} catch (ClassNotFoundException | SQLException e) {
@@ -449,6 +461,7 @@ public class AdministratorService {
 										}
 									} catch(InputMismatchException e) {
 										System.out.println("ERROR: integer required");
+										scanner.nextLine();
 									}
 								}
 							}
@@ -461,6 +474,7 @@ public class AdministratorService {
 				}
 			} catch(InputMismatchException e) {
 				System.out.println("ERROR: enter an integer from 1 to 5");
+				scanner.nextLine();
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -555,7 +569,7 @@ public class AdministratorService {
 							}
 						} catch (InputMismatchException e) {
 							System.out.println("Error: not an integer");
-							return null;
+							scanner.nextLine();
 						}
 					}
 				}
@@ -635,7 +649,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
-							break;
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -704,6 +718,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -808,7 +823,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
-							break;
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -877,6 +892,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -1002,7 +1018,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
-							break;
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -1092,6 +1108,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -1189,7 +1206,7 @@ public class AdministratorService {
 				}
 			} catch(NumberFormatException | InputMismatchException e) {
 				System.out.println("Invalid input" + option);
-				return;
+				scanner.nextLine();
 			}
 		}
 		System.out.println("Would you like to update the library's name and address or add/remove book copies?"
@@ -1233,7 +1250,7 @@ public class AdministratorService {
 				}
 			} catch(NumberFormatException | InputMismatchException e) {
 				System.out.println("Invalid input" + option);
-				return;
+				scanner.nextLine();
 			}
 		}
 		/* check branch dependencies (books cannot be loaned out from this branch) */
@@ -1402,7 +1419,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
-							break;
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -1490,7 +1507,7 @@ public class AdministratorService {
 							}
 						} catch(InputMismatchException e) {
 							System.out.println("ERROR: integer required");
-							break;
+							scanner.nextLine();
 						}
 					}
    	   			}
@@ -1554,7 +1571,7 @@ public class AdministratorService {
    				}
    			}
    		} catch (ClassNotFoundException | SQLException| InputMismatchException e) {
-			e.printStackTrace();
+			scanner.nextLine();
 			return;
    		}
 	}
