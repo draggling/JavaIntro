@@ -1,11 +1,9 @@
 package com.ss.lms.service;
 
 import java.sql.Connection;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Scanner;
 
 import com.ss.lms.dao.AuthorDAO;
 import com.ss.lms.dao.BookDAO;
@@ -31,7 +29,6 @@ public class EntityGetter {
 	
 	public Book readBook(Book book) throws ClassNotFoundException {
 		try (Connection conn = conUtil.getConnection()){
-			BookDAO bdao = new BookDAO(conn);
 			PublisherDAO pdao = new PublisherDAO(conn);
 			AuthorDAO adao = new AuthorDAO(conn);
 			GenreDAO gdao = new GenreDAO(conn);

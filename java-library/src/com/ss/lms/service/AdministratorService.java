@@ -3,7 +3,6 @@ package com.ss.lms.service;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -16,22 +15,15 @@ import com.ss.lms.crud.CRUDBranch;
 import com.ss.lms.crud.CRUDGenre;
 import com.ss.lms.crud.CRUDPublisher;
 import com.ss.lms.dao.AuthorDAO;
-import com.ss.lms.dao.BookCopiesDAO;
-import com.ss.lms.dao.BranchDAO;
 import com.ss.lms.dao.GenreDAO;
 import com.ss.lms.dao.LoanDAO;
 import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.dao.BookDAO;
-import com.ss.lms.dao.BorrowerDAO;
 import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
-import com.ss.lms.entity.BookCopies;
-import com.ss.lms.entity.Borrower;
-import com.ss.lms.entity.Branch;
 import com.ss.lms.entity.Genre;
 import com.ss.lms.entity.Loan;
 import com.ss.lms.entity.Publisher;
-
 public class AdministratorService {
 
 	LibrarianService LS = new LibrarianService();

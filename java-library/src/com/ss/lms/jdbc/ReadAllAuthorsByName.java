@@ -22,7 +22,7 @@ public class ReadAllAuthorsByName {
 	public static String driverName = "com.mysql.jdbc.Driver";
 	public static String url = "jdbc:mysql://localhost:3306/library_java?useSSL=false&allowPublicKeyRetrieval=true";
 	public static String userName = "root";
-	public static String password = "dumpling97";
+	public static String password = "root";
 
 	/**	
 	 * @param args
@@ -32,11 +32,9 @@ public class ReadAllAuthorsByName {
 		Scanner scan = new Scanner(System.in);
 		System.err.println("Enter a Author Name to search: ");
 		String authorName = scan.nextLine();
-		String query = "SELECT * FROM tbl_author where authorName = '"+authorName+"'";
 		try {
 			Class.forName(driverName);
 			Connection conn = DriverManager.getConnection(url, userName, password);
-//			Statement stmt = conn.createStatement();
 			PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM tbl_author where authorName = ?");
 			pstmt.setString(1, authorName);
 			ResultSet rs = pstmt.executeQuery();
@@ -47,6 +45,8 @@ public class ReadAllAuthorsByName {
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
+		} finally {
+			scan.close();
 		}
 
 	}

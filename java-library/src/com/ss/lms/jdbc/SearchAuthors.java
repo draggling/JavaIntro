@@ -4,15 +4,12 @@
 package com.ss.lms.jdbc;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
+
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Scanner;
 
 import com.ss.lms.dao.AuthorDAO;
-import com.ss.lms.dao.BranchDAO;
 import com.ss.lms.entity.Author;
 import com.ss.lms.service.ConnectionUtil;
 
@@ -73,6 +70,8 @@ public class SearchAuthors {
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			return "Error";
+		} finally {
+			scan.close();
 		}
 	}
 }

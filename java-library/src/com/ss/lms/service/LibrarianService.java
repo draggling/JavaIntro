@@ -24,7 +24,6 @@ public class LibrarianService {
 
 	public Book readBook(Book book) throws ClassNotFoundException {
 		try (Connection conn = conUtil.getConnection()){
-			BookDAO bdao = new BookDAO(conn);
 			PublisherDAO pdao = new PublisherDAO(conn);
 			AuthorDAO adao = new AuthorDAO(conn);
 			GenreDAO gdao = new GenreDAO(conn);

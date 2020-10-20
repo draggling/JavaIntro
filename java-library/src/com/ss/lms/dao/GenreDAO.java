@@ -4,15 +4,12 @@
 package com.ss.lms.dao;
 
 import java.sql.Connection;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ss.lms.entity.Genre;
-import com.ss.lms.entity.Author;
-import com.ss.lms.entity.Borrower;
-import com.ss.lms.entity.Branch;
 import com.ss.lms.entity.Genre;
 
 /**

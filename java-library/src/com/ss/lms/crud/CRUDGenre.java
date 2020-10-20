@@ -8,7 +8,6 @@ import java.util.Scanner;
 
 import com.ss.lms.dao.BookDAO;
 import com.ss.lms.dao.GenreDAO;
-import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.entity.Genre;
 import com.ss.lms.service.ConnectionUtil;
 

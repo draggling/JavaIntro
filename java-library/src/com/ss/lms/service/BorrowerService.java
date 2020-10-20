@@ -1,16 +1,14 @@
 package com.ss.lms.service;
 
 import java.sql.Connection;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 import com.ss.lms.dao.AuthorDAO;
 import com.ss.lms.dao.BookDAO;
 import com.ss.lms.dao.BorrowerDAO;
-import com.ss.lms.dao.BranchDAO;
 import com.ss.lms.dao.GenreDAO;
 import com.ss.lms.dao.LoanDAO;
 import com.ss.lms.dao.PublisherDAO;
@@ -28,7 +26,6 @@ public class BorrowerService {
 	
 	public Book readBook(Book book) throws ClassNotFoundException {
 		try (Connection conn = conUtil.getConnection()){
-			BookDAO bdao = new BookDAO(conn);
 			PublisherDAO pdao = new PublisherDAO(conn);
 			AuthorDAO adao = new AuthorDAO(conn);
 			GenreDAO gdao = new GenreDAO(conn);
