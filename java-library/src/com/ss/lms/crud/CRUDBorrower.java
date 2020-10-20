@@ -238,7 +238,7 @@ public class CRUDBorrower {
 				} else if(book.size() == 1) {
 					return readBook((book.get(0)));
 				} else {
-					System.out.println("Pick the Book you want to add copies of to your branch:");
+					System.out.println("Choose a book:");
 					List<Book> branchBooks = new ArrayList<>();
 					branchBooks = bdao.readAllBooks();
 					int counter = 1;

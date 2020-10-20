@@ -74,6 +74,7 @@ public class AdministratorService {
 	public void readBorrowers() {CBorrower.readBorrowers();}
 	/* OVERRIDE DUE DATE */
 	public void overrideDueDate() {
+		int value = -1;
 		System.out.println("Printing all loans currently out");
    		try (Connection conn = conUtil.getConnection()){
    			LoanDAO ldao = new LoanDAO(conn);
@@ -100,8 +101,18 @@ public class AdministratorService {
    					} else {
    						Loan currentLoan = Loans.get(choice-1);
    			   			LoanDAO ldao2 = new LoanDAO(conn);
-   						ldao2.extendLoan(currentLoan);
-   						System.out.println("Loan due date extended by 7 days");
+   			   			try {
+			   				System.out.println("Your loan dueDate " + currentLoan.getDueDate());
+   			   				while(value < 0) {
+   			   					System.out.print("How many days would you like to extend your due date? ");
+   			   					value = scanner.nextInt();
+   			   					scanner.nextLine();
+   			   				}
+   			   			} catch(InputMismatchException e) {
+   			   				System.out.println("Please input an integer greater than or equal to 0");
+   			   			}
+   						ldao2.extendLoan(currentLoan, value);
+   						System.out.println("Loan due date extended by " + value + " days");
    					}
    				}
    			}

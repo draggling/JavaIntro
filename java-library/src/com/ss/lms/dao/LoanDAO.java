@@ -45,6 +45,11 @@ public class LoanDAO extends BaseDAO<Loan>{
 				new Object[] { loan.getBookId(), loan.getBranchId(), loan.getCardNo()});
 	}
 	
+	public void extendLoan(Loan loan, Integer days) throws ClassNotFoundException, SQLException {
+		save("UPDATE tbl_book_loans SET dueDate = date_add(dueDate, INTERVAL ? DAY) WHERE bookId = ? and branchId = ? and cardNo = ?",
+				new Object[] {days, loan.getBookId(), loan.getBranchId(), loan.getCardNo()});
+	}
+	
 	/* all active loans in a specific branch */
 	public List<Loan> readAllActiveBranchLoans(Branch branch) throws SQLException, ClassNotFoundException {
 		return read("SELECT * FROM tbl_book_loans WHERE branchNo = ? and dateIn IS NULL", new Object[] {branch.getBranchId()});
@@ -53,6 +58,19 @@ public class LoanDAO extends BaseDAO<Loan>{
 	/* all active loans for a specific borrower */
 	public List<Loan> readAllActiveBorrowerLoans(Integer cardNo) throws SQLException, ClassNotFoundException {
 		return read("SELECT * FROM tbl_book_loans WHERE cardNo = ? and dateIn IS NULL", new Object[] {cardNo});
+	}
+	
+	public boolean expiredLoanExists(Integer cardNo, Integer branchId, Integer bookId) throws SQLException, ClassNotFoundException {
+		if(read("SELECT * FROM tbl_book_loans WHERE cardNo = ? and branchId = ? and bookId = ?", new Object[] {cardNo, branchId, bookId}).size() == 1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void updateExpiredLoan(Integer cardNo, Integer branchId, Integer bookId) throws ClassNotFoundException, SQLException {
+		save("UPDATE tbl_book_loans SET dateOut = NOW(), dueDate = (DATE_ADD(NOW(), INTERVAL 7 DAY)), dateIn = NULL "
+				+ "WHERE cardNo = ? and branchId = ? and bookId = ? ", new Object[] {cardNo, branchId, bookId}); 
 	}
 	
 	/* all active loans */

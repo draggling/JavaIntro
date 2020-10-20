@@ -13,7 +13,7 @@ public class ConnectionUtil {
 	public String driverName = "com.mysql.jdbc.Driver";
 	public String url = "jdbc:mysql://localhost:3306/library_java?useSSL=false&allowPublicKeyRetrieval=true";
 	public String userName = "root";
-	public String password = "root";
+	public String password = "dumpling97";
 	public Connection getConnection(){
 		Connection conn = null;
 		try {

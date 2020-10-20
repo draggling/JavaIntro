@@ -265,7 +265,6 @@ public class Menus {
 					case(2):
 						Book book = BS.searchBranchAvailableBooks(user.getCardNo(), branch.getBranchId());
 						if(book != null) {
-							System.out.println("Book Details:\n" + book.toString() + "\nchecking out book... ");
 							if(BS.checkBorrowerLoans(user, book)) {
 								System.out.println("You already have this book loaned out");
 							} else {

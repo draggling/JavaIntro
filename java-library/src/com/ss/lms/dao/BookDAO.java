@@ -77,6 +77,11 @@ public class BookDAO extends BaseDAO<Book>{
 			return false;
 		}
 	}
+	
+	public List<Book> readAllBranchBooks(Branch branch) throws SQLException, ClassNotFoundException {
+		return read("SELECT * FROM tbl_book b WHERE EXISTS (SELECT * FROM tbl_book_copies WHERE bookId = b.bookId and branchId = ?)",
+				new Object[] {branch.getBranchId()});
+	}
 		
 	public int checkBookPublisherDependency(Publisher publisher) throws ClassNotFoundException, SQLException {
 		return read("SELECT * FROM tbl_book b WHERE 1 <= "
@@ -120,7 +125,8 @@ public class BookDAO extends BaseDAO<Book>{
 	}
 	
 	public List<Book> readAvailableBranchBooksByName(int branchId, String searchString) throws SQLException, ClassNotFoundException {
-		return read("SELECT * FROM tbl_book b WHERE EXISTS (SELECT * FROM tbl_book_copies WHERE bookId = b.bookId  and b.title = (?) and branchId = ? and noOfCopies > "
+		searchString = "%" + searchString + "%";
+		return read("SELECT * FROM tbl_book b WHERE b.title LIKE (?) and EXISTS (SELECT * FROM tbl_book_copies WHERE bookId = b.bookId and branchId = ? and noOfCopies > "
 				+ "(SELECT COUNT(*) FROM tbl_book_loans bl WHERE bl.bookId = b.bookId and bl.branchId = ? and dateIn IS NULL))",
 				new Object[] {searchString, branchId,  branchId}); 
 	}

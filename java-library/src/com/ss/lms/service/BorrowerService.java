@@ -3,6 +3,7 @@ package com.ss.lms.service;
 import java.sql.Connection;
 
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -82,10 +83,19 @@ public class BorrowerService {
 	}
 	
 	public boolean checkBorrowerLoans(Borrower borrower, Book book) {
-		for(Loan b: borrower.getLoans()) {
-			if(b.getBookId() == book.getBookId()) {
-				return true;
+		try(Connection conn = conUtil.getConnection()) {
+			LoanDAO LDAO = new LoanDAO(conn);
+			List<Loan> loans = LDAO.readAllActiveBorrowerLoans(borrower.getCardNo());
+			for(Loan l: loans) {
+				if(book.getBookId() == l.getBookId()) {
+					return true;
+				} else {
+					return false;
+				}
 			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			return true;
 		}
 		return false;
 	}
@@ -95,16 +105,33 @@ public class BorrowerService {
 			System.out.print("Enter title of book: ");
 			String searchString = scanner.nextLine();
 			BookDAO bDAO = new BookDAO(conn);
-			List<Book> book = bDAO.readAvailableBranchBooksByName(branchId, searchString);
-
-			if(book.size() == 0) {
+			List<Book> books = bDAO.readAvailableBranchBooksByName(branchId, searchString);
+			if(books.size() == 0) {
 				System.out.println("Book not found");
 				return null;
-			} else if(book.size() == 1) {
-				return readBook(book.get(0));
+			} else if(books.size() == 1) {
+				return readBook(books.get(0));
 			} else {
-				System.err.println("ERROR: multiple books with the same title found");
-				return null;
+				int counter = 1;
+				for(Book b : books) {
+					System.out.println(counter + ") " + readBook(b).toString());
+					counter++;
+				}
+				while(true) {
+					try {
+						System.out.print("Choose: ");
+						int input = scanner.nextInt();
+						scanner.nextLine();
+						if(input > 0 && input < counter) {
+							return readBook(books.get(input - 1));
+						} else {
+							System.out.println("Invalid input");
+						}
+					} catch (InputMismatchException e) {
+						System.out.println("Error: not an integer");
+						scanner.nextLine();
+					}
+				}
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -116,7 +143,12 @@ public class BorrowerService {
 		Loan loan = new Loan(book.getBookId(), branch.getBranchId(), borrower.getCardNo());
 		try(Connection conn = conUtil.getConnection()) {
 			LoanDAO LDAO = new LoanDAO(conn);
-			LDAO.checkOutBook(loan);
+			if(LDAO.expiredLoanExists(borrower.getCardNo(), branch.getBranchId(), book.getBookId())) {
+				System.out.println("You have borrowed this book before... updating loan");
+				LDAO.updateExpiredLoan(borrower.getCardNo(), branch.getBranchId(), book.getBookId());
+			} else {
+				LDAO.checkOutBook(loan);
+			}
 			System.out.println("loan issued");
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
