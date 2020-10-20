@@ -294,7 +294,7 @@ public class Menus {
 		}
 		int counter = 1;
 		for(Loan loan : loans) {
-			System.out.println(counter + ") " + loan.toString());
+			System.out.println(counter + ") " + loan.bookInfo());
 			counter++;
 		}
 		System.out.println(counter + ") Return to main menu");
@@ -419,7 +419,7 @@ public class Menus {
 				System.out.println("1) Add author");
 				System.out.println("2) Update author");
 				System.out.println("3) Delete author");
-				System.out.println("4) Read author");
+				System.out.println("4) Read authors");
 				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();
@@ -458,7 +458,7 @@ public class Menus {
 				System.out.println("1) Add genre");
 				System.out.println("2) Update genre");
 				System.out.println("3) Delete genre");
-				System.out.println("4) Read genre");
+				System.out.println("4) Read genres");
 				System.out.println("5) Return to Main Menu");
 				System.out.print("Choose an option: ");
 				int option = scanner.nextInt();

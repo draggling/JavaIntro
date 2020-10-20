@@ -4,8 +4,6 @@
 package com.ss.lms.entity;
 
 import java.sql.Date;
-import java.util.Calendar;
-import java.util.List;
 
 import com.ss.lms.service.EntityGetter;
 
@@ -100,7 +98,14 @@ public class Loan {
 			this.dateIn = getDateIn();
 		}
 	}
-	
+	public String bookInfo() {
+		String output = "";
+		output += ("Book Info: " + EG.findBook(this.bookId).toString() + "\n");
+		output += ("Branch Info: " + EG.findBranch(this.branchId).toString());
+		output += ("Date Out: " + this.dateOut + "\n");
+		output += ("Due Date " + this.dueDate + "\n");
+		return output;
+	}
 	public String toString() {
 		//String output = "";
 		String output = ("Borrower Info: " + EG.findBorrower(this.cardNo).toString() + "\n");
