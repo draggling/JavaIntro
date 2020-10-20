@@ -92,7 +92,7 @@ public class LibrarianService {
 			}
 			System.out.println(counter + ") " + "Return to Main Menu");
 			while(true) {
-				try {
+				try (Connection conn2 = conUtil.getConnection()) {
 					int input = scanner.nextInt();
 					if(input == counter) {
 						return true;
@@ -128,7 +128,6 @@ public class LibrarianService {
 										bdao.addNewBookCopies(b, branch.getBranchId(), copies);
 									}
 									System.out.println("Copies added");
-									conn.commit();
 									return true;
 								} else if(copies == 0) {
 									System.out.println("No copies added");
