@@ -1,6 +1,7 @@
 package com.ss.lms.service;
 
 import java.sql.Connection;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -16,13 +17,11 @@ import com.ss.lms.crud.CRUDGenre;
 import com.ss.lms.crud.CRUDPublisher;
 import com.ss.lms.dao.AuthorDAO;
 import com.ss.lms.dao.GenreDAO;
-import com.ss.lms.dao.LoanDAO;
 import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.dao.BookDAO;
 import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
 import com.ss.lms.entity.Genre;
-import com.ss.lms.entity.Loan;
 import com.ss.lms.entity.Publisher;
 public class AdministratorService {
 
@@ -73,43 +72,8 @@ public class AdministratorService {
 	public void deleteBorrower() {CBorrower.deleteBorrower();}
 	public void readBorrowers() {CBorrower.readBorrowers();}
 	/* OVERRIDE DUE DATE */
-	public void overrideDueDate() {
-		System.out.println("Printing all loans currently out");
-   		try (Connection conn = conUtil.getConnection()){
-   			LoanDAO ldao = new LoanDAO(conn);
-   			List<Loan> Loans = ldao.readAllActiveLoans();
-   			int counter = 1;
-   			if(Loans.size() == 0) {
-   				System.out.println("No active loans. Returning...");
-   				return;
-   			} else {
-   				for(Loan l : Loans) {
-   					System.out.println(counter + ")\n" + l.toString());
-   					counter++;
-   				}
-   				System.out.println(counter + ") Return");
-   				int choice = 0;
-   				while (choice < 1 || choice > counter) {
-   					choice = scanner.nextInt();
-   					scanner.nextLine();
-   					if(choice == counter) {
-   						System.out.println("returning");
-   						return;
-   					} else if(choice < 1 || choice > counter) {
-   						System.out.println("Invalid choice");
-   					} else {
-   						Loan currentLoan = Loans.get(choice-1);
-   			   			LoanDAO ldao2 = new LoanDAO(conn);
-   						ldao2.extendLoan(currentLoan);
-   						System.out.println("Loan due date extended by 7 days");
-   					}
-   				}
-   			}
-   		} catch (ClassNotFoundException | SQLException| InputMismatchException e) {
-			scanner.nextLine();
-			return;
-   		}
-	}
+	public void overrideDueDate() {CBookCopies.overrideDueDate();}
+	
 	/* HELPER BOOK FUNCTIONS */
 	/* returns a book */
 	public Book chooseBook() {

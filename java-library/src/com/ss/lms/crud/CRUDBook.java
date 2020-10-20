@@ -404,7 +404,7 @@ public class CRUDBook {
 								System.out.println(count + ") " + g.getGenreName());
 								count++;
 							}
-							System.out.print("Choose a genre to remove from book (from the integer list): ");
+							System.out.print("Choose a genre to add to book (from the integer list): ");
 							genreOption = 0;
 							while(genreOption < 1 || genreOption >= count) {
 								try {
@@ -484,7 +484,7 @@ public class CRUDBook {
 				bdao.deleteBook(book);
 				System.out.println("Book Deleted");
 			} else {
-				System.out.println("There are " + bookLoaned + "copies of this book loaned out");
+				System.out.println("There are " + bookLoaned + " copies of this book loaned out");
 				System.out.println("Cannot delete a book that has copies loaned out");
 			}
 		} catch (ClassNotFoundException | SQLException e) {
@@ -506,7 +506,7 @@ public class CRUDBook {
 				} else if(book.size() == 1) {
 					return readBook((book.get(0)));
 				} else {
-					System.out.println("Pick the Book you want to add copies of to your branch:");
+					System.out.println("Choose a book:");
 					List<Book> branchBooks = new ArrayList<>();
 					branchBooks = bdao.readAllBooks();
 					int counter = 1;

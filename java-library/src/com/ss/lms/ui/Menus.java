@@ -57,23 +57,24 @@ public class Menus {
 	public void LIB1() throws ClassNotFoundException, SQLException {
 		System.out.println("1) Enter Branch you manage"
 				+ "\n2) Quit to Previous");
-		try {
 			while(true) {
-				int option = scanner.nextInt();
-				switch(option) {
-					case(1):
-						LIB2();
-						return;
-					case(2):
-						MainMenu();
-						return;
-					default:
-						System.out.println("Invalid input. Please choose a number from 1 to 2");
+				try {
+					int option = scanner.nextInt();
+					switch(option) {
+						case(1):
+							LIB2();
+							return;
+						case(2):
+							MainMenu();
+							return;
+						default:
+							System.out.println("Invalid input. Please choose a number from 1 to 2");
+					}
+				} catch(NumberFormatException | InputMismatchException e) {
+					System.out.println("Invalid input. Please choose a number from 1 to 2");
+					scanner.nextLine();
 				}
 			}
-		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("Invalid input. Please choose a number from 1 to 2");
-		}
 	}
 	/* Choose library branch or return to LIB1 */
 	public void LIB2() throws ClassNotFoundException, SQLException {
@@ -265,7 +266,6 @@ public class Menus {
 					case(2):
 						Book book = BS.searchBranchAvailableBooks(user.getCardNo(), branch.getBranchId());
 						if(book != null) {
-							System.out.println("Book Details:\n" + book.toString() + "\nchecking out book... ");
 							if(BS.checkBorrowerLoans(user, book)) {
 								System.out.println("You already have this book loaned out");
 							} else {
@@ -318,8 +318,8 @@ public class Menus {
 	}
 	
 	public void ADMIN() throws ClassNotFoundException, SQLException {
-		try {
-			while(true) {
+		while(true) {
+			try {
 				System.out.println("*************");
 				System.out.println("1) Add/Update/Delete/Read Book");
 				System.out.println("2) Add/Update/Delete/Read Author");
@@ -361,10 +361,10 @@ public class Menus {
 					default:
 						System.out.println("Invalid Input");
 				}
+			} catch(NumberFormatException | InputMismatchException e) {
+				System.out.println("Invalid input. Please choose a number from 1 to 8");
+				scanner.nextLine();
 			}
-		} catch(NumberFormatException | InputMismatchException e) {
-			System.out.println("Invalid input. Please choose a number from 1 to 8");
-			scanner.nextLine();
 		}
 	}
 	

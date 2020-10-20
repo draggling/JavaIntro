@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.ss.lms.dao.AuthorDAO;
+import com.ss.lms.dao.BookCopiesDAO;
 import com.ss.lms.dao.BookDAO;
 import com.ss.lms.dao.BranchDAO;
 import com.ss.lms.dao.GenreDAO;
 import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
+import com.ss.lms.entity.BookCopies;
 import com.ss.lms.entity.Branch;
 import com.ss.lms.entity.Genre;
 import com.ss.lms.entity.Publisher;
@@ -73,6 +75,8 @@ public class LibrarianService {
 		System.out.println("Library branch successfully changed!");
 		return true;
 	}
+	
+	/* librarian add book copies option */
 	public Boolean AddBookCopies(Branch branch) {
 		int counter = 1;
 		System.out.println("Pick the Book you want to add copies of to your branch:");
@@ -80,7 +84,9 @@ public class LibrarianService {
 		try(Connection conn = conUtil.getConnection()) {
 			BookDAO bdao = new BookDAO(conn);
 			branchBooks = bdao.readAllBooks();
+			//branchBooks = bdao.readAllBranchBooks(branch);
 			for(Book b : branchBooks) {
+				b = readBook(b);
 				System.out.println(counter + ") " + b.toString());
 				counter++;
 			}
@@ -97,17 +103,31 @@ public class LibrarianService {
 							/* update row if false, insert row if true */
 							newRow = false;
 						}
+						if(newRow) {
+							System.out.println("No are currently no copies of this book");
+						} else {
+							BookCopiesDAO bcdao = new BookCopiesDAO(conn);
+							List<BookCopies> tempCopies = bcdao.findBookCopiesByBranch(b, branch);
+							if(tempCopies.size() == 0) {
+								System.out.println("ERROR with copies retrieval: no copies found... exiting");
+								return false;
+							} else if(tempCopies.size() == 1) {
+								System.out.println("There are  " + tempCopies.get(0).getNoOfCopies() + " copies of this book");
+							} else {
+								System.out.println("ERROR with copies retrieval: multiple copy records found... exiting");
+							}
+						}
 						System.out.print("How many copies do you want to add? ");
 						try {
 							while(true) {
 								int copies = scanner.nextInt();
 								if(copies > 0) {
-									System.out.println("Copies added");
 									if(!newRow) {
 										bdao.addBookCopies(b, branch.getBranchId(), copies);
 									} else {
 										bdao.addNewBookCopies(b, branch.getBranchId(), copies);
 									}
+									System.out.println("Copies added");
 									conn.commit();
 									return true;
 								} else if(copies == 0) {
