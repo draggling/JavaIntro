@@ -10,16 +10,66 @@ import java.util.Scanner;
 import com.ss.lms.dao.AuthorDAO;
 import com.ss.lms.dao.BookDAO;
 import com.ss.lms.dao.GenreDAO;
+import com.ss.lms.dao.LoanDAO;
 import com.ss.lms.dao.PublisherDAO;
 import com.ss.lms.entity.Author;
 import com.ss.lms.entity.Book;
 import com.ss.lms.entity.Genre;
+import com.ss.lms.entity.Loan;
 import com.ss.lms.entity.Publisher;
 import com.ss.lms.service.ConnectionUtil;
 
 public class CRUDBookCopies {
 	public ConnectionUtil conUtil = new ConnectionUtil();
 	Scanner scanner = new Scanner(System.in);
+	public void overrideDueDate() {
+		int value = -1;
+		System.out.println("Printing all loans currently out");
+   		try (Connection conn = conUtil.getConnection()){
+   			LoanDAO ldao = new LoanDAO(conn);
+   			List<Loan> Loans = ldao.readAllActiveLoans();
+   			int counter = 1;
+   			if(Loans.size() == 0) {
+   				System.out.println("No active loans. Returning...");
+   				return;
+   			} else {
+   				for(Loan l : Loans) {
+   					System.out.println(counter + ")\n" + l.toString());
+   					counter++;
+   				}
+   				System.out.println(counter + ") Return");
+   				int choice = 0;
+   				while (choice < 1 || choice > counter) {
+   					choice = scanner.nextInt();
+   					scanner.nextLine();
+   					if(choice == counter) {
+   						System.out.println("returning");
+   						return;
+   					} else if(choice < 1 || choice > counter) {
+   						System.out.println("Invalid choice");
+   					} else {
+   						Loan currentLoan = Loans.get(choice-1);
+   			   			LoanDAO ldao2 = new LoanDAO(conn);
+   			   			try {
+			   				System.out.println("Your loan dueDate " + currentLoan.getDueDate());
+   			   				while(value < 0) {
+   			   					System.out.print("How many days would you like to extend your due date? ");
+   			   					value = scanner.nextInt();
+   			   					scanner.nextLine();
+   			   				}
+   			   			} catch(InputMismatchException e) {
+   			   				System.out.println("Please input an integer greater than or equal to 0");
+   			   			}
+   						ldao2.extendLoan(currentLoan, value);
+   						System.out.println("Loan due date extended by " + value + " days");
+   					}
+   				}
+   			}
+   		} catch (ClassNotFoundException | SQLException| InputMismatchException e) {
+			scanner.nextLine();
+			return;
+   		}
+	}
 	public Book chooseBook() {
 		try(Connection conn = conUtil.getConnection()) {
 			while(true) {
