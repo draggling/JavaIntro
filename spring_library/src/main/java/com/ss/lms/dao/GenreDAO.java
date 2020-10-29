@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
 
 import com.ss.lms.entity.Genre;
 
@@ -16,6 +17,8 @@ import com.ss.lms.entity.Genre;
  * @author danwoo
  *
  */
+
+@Repository
 public class GenreDAO extends BaseDAO<Genre> implements ResultSetExtractor<List<Genre>> {
 
 	

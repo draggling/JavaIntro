@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ss.lms.entity.Branch;
 //import com.ss.lms.entity.Book;
@@ -17,6 +20,8 @@ import com.ss.lms.entity.Branch;
  * @Branch danwoo
  *
  */
+
+@Repository
 public class BranchDAO extends BaseDAO<Branch> implements ResultSetExtractor<List<Branch>>{
 
 	public Branch getBranch(Integer branchId) throws ClassNotFoundException, SQLException {
@@ -56,7 +61,8 @@ public class BranchDAO extends BaseDAO<Branch> implements ResultSetExtractor<Lis
 	public void deleteBranch(Branch Branch) throws ClassNotFoundException, SQLException {
 		jdbcTemplate.update("DELETE FROM tbl_branch WHERE BranchId = ?", new Object[] { Branch.getBranchId() });
 	}
-
+	
+	@RequestMapping(value = "/readAllBranches", method = RequestMethod.GET, produces = "application/json")
 	public List<Branch> readAllBranches() throws SQLException, ClassNotFoundException {
 		return jdbcTemplate.query("SELECT * FROM tbl_branch", this);
 	}

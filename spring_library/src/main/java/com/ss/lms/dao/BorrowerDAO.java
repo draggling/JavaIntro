@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
 
 import com.ss.lms.entity.Borrower;
 
@@ -16,6 +17,8 @@ import com.ss.lms.entity.Borrower;
  * @author danwoo
  *
  */
+
+@Repository
 public class BorrowerDAO extends BaseDAO<Borrower>  implements ResultSetExtractor<List<Borrower>>{
 	
 	public Borrower getBorrower(Integer cardNo) throws ClassNotFoundException, SQLException {

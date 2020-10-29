@@ -1,13 +1,14 @@
 package com.ss.lms.service;
 
 import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.stereotype.Repository;
 import com.ss.lms.dao.AuthorDAO;
 import com.ss.lms.dao.BookCopiesDAO;
 import com.ss.lms.dao.BookDAO;
@@ -23,6 +24,7 @@ import com.ss.lms.entity.Branch;
 import com.ss.lms.entity.Genre;
 import com.ss.lms.entity.Publisher;
 
+@Repository
 public class LibrarianService {
 	
 	@Autowired

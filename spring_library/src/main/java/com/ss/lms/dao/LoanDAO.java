@@ -4,12 +4,13 @@
 package com.ss.lms.dao;
 
 import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
-
+import org.springframework.stereotype.Repository;
 import com.ss.lms.entity.Loan;
 import com.ss.lms.entity.Book;
 import com.ss.lms.entity.Borrower;
@@ -19,6 +20,8 @@ import com.ss.lms.entity.Branch;
  * @author danwoo
  *
  */
+
+@Repository
 public class LoanDAO extends BaseDAO<Loan> implements ResultSetExtractor<List<Loan>>{
 	
 	public Loan getLoan(Integer bookId, Integer branchId, Integer cardNo) throws ClassNotFoundException, SQLException {

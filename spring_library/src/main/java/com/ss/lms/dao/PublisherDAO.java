@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
 
 import com.ss.lms.entity.Publisher;
 
@@ -16,6 +17,8 @@ import com.ss.lms.entity.Publisher;
  * @author danwoo
  *
  */
+
+@Repository
 public class PublisherDAO extends BaseDAO<Publisher> implements ResultSetExtractor<List<Publisher>>{
 	
 	public Publisher getPublisher(Integer publisherId) throws ClassNotFoundException, SQLException {
