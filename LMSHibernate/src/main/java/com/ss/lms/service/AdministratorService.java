@@ -29,6 +29,7 @@ import com.ss.lms.entity.Genre;
 import com.ss.lms.entity.Publisher;
 import com.ss.lms.repo.AuthorRepo;
 import com.ss.lms.repo.BookAuthorsRepo;
+import com.ss.lms.repo.BookCopiesRepo;
 import com.ss.lms.repo.BookGenresRepo;
 import com.ss.lms.repo.BookRepo;
 import com.ss.lms.repo.BorrowerRepo;
@@ -67,7 +68,35 @@ public class AdministratorService {
 	@Autowired
 	LoanRepo lrepo;
 	
+	@Autowired
+	BookCopiesRepo bcrepo;
 	 
+	/* LIBRARY FUNCTIONS */
+	
+	/* add book copies to a branch */
+	@Transactional
+	@RequestMapping(value = "/addBookCopies", method = RequestMethod.PUT)
+	public String addBookCopies(@RequestParam Integer bookId, @RequestParam Integer branchId, @RequestParam Integer noOfCopies) throws SQLException{
+		if(noOfCopies <= 0) {
+			return "Invalid noOfCopies";
+		} else if(!brepo.existsById(bookId)) {
+			return "Book with id: " + bookId + " does not exist";
+		} else if(!brrepo.existsById(branchId)) {
+			return "Branch with id: " + branchId + " does not exist";
+		} else if(bcrepo.bookCopiesExist(bookId, branchId).size() == 0) {
+			/* add new row to book copies table */
+			bcrepo.addNewBookCopies(bookId, branchId, noOfCopies);
+			return "new book copies added for bookId: " + bookId + " in branchId: " + branchId +
+					"\nNew number of copies " + noOfCopies;
+		} else {
+			int currentcopies = bcrepo.bookCopiesExist(bookId, branchId).get(0).getNoOfCopies();
+			bcrepo.addExistingBookCopies(bookId, branchId, noOfCopies);
+			return "Former number of copies " + currentcopies + " copies of bookId:" + bookId + " in branch: " + branchId +
+					"\nNew number of copies " + (currentcopies + noOfCopies);
+		}
+	}
+	
+	/* ADMIN FUNCTIONS */
 	/* book functions */
 	
 	/* read all books */
@@ -432,8 +461,43 @@ public class AdministratorService {
 		}
 	}
 	
-
+	/* i was receiving errors creating 2 separate hibernate projects for administrator and borrower services */
+	/* borrower functions */
 	
-
-
+	/* check out a book */
+	@Transactional
+	@RequestMapping(value = "/checkOutBook", method = RequestMethod.PUT)
+	public String checkOutBook(@RequestParam Integer cardNo, @RequestParam Integer bookId,
+			@RequestParam Integer branchId) throws SQLException {
+		if (bcrepo.bookCopiesExist(bookId, branchId).get(0).getNoOfCopies() == 0) {
+			return "there are no copies of book " + bookId + "in branch " + branchId;
+		}else if(lrepo.loanExists(cardNo, bookId, branchId).size() != 0) {
+			return "loan for cardNo: " + cardNo + " in branch: " + branchId + " alread exists for book: " + bookId;	
+		} else if(bcrepo.bookCopiesExist(bookId, branchId).get(0).getNoOfCopies() <= lrepo.bookBranchLoans(bookId, branchId).size()) {
+			return "all copies of book + " +bookId+ " in branch " +branchId+ " are currently checked out";
+		} else if(lrepo.loanExpired(cardNo, bookId, branchId).size() == 0){
+			/* row already exists but it is expired */
+			lrepo.addLoan(cardNo, bookId, branchId);
+			return "book checked out";
+		} else {
+			lrepo.updateLoan(cardNo, bookId, branchId);
+			return "old loan exists: loan updated and book checked out again";
+		}
+	}
+	
+	/* check in a book */
+	@Transactional
+	@RequestMapping(value = "/checkInBook", method = RequestMethod.PUT)
+	public String checkInBook(@RequestParam Integer cardNo, @RequestParam Integer bookId,
+			@RequestParam Integer branchId) throws SQLException {
+		if (bcrepo.bookCopiesExist(bookId, branchId).get(0).getNoOfCopies() == 0) {
+			return "there are no loans of book " + bookId + "in branch " + branchId;
+		}else if(lrepo.loanExpired(cardNo, bookId, branchId).size() != 0) {
+			lrepo.updateLoan(cardNo, bookId, branchId);
+			return "loan for cardNo: " + cardNo + " in branch: " + branchId + " already checked in for book: " + bookId;	
+		} else {
+			lrepo.checkInBook(cardNo, bookId, branchId);
+			return "book checked in";
+		}
+	}
 }
